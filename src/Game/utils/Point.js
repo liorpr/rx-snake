@@ -1,7 +1,8 @@
 export default class Point {
-  constructor(x, y) {
+  constructor(x, y, size = 1) {
     this.x = x;
     this.y = y;
+    this.size = size;
   }
 
   static random(width, height) {
@@ -16,7 +17,11 @@ export default class Point {
     return new Point((this.x + width) % width, (this.y + height) % height);
   }
 
+  inflate(size = 1.5) {
+    return new Point(this.x, this.y, this.size * size);
+  }
+
   equals(other) {
-    return this.x === other.x && this.y === other.y;
+    return other && this.x === other.x && this.y === other.y;
   }
 }

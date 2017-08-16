@@ -4,10 +4,10 @@ import Point from './utils/Point';
 
 const Dot = ({ size, point, color }) => (
   <div style={{
-    width: size,
-    height: size,
-    left: point.x * size,
-    top: point.y * size,
+    width: point.size * size,
+    height: point.size * size,
+    left: point.x * size - (((point.size - 1) / 2) * size),
+    top: point.y * size - (((point.size - 1) / 2) * size),
     backgroundColor: color,
     position: 'absolute',
     borderRadius: '50%',

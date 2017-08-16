@@ -6,7 +6,7 @@ import Board from './Board';
 import withKeyDown from "./withKeyDown";
 import Point from './utils/Point';
 
-const width=60, height=80;
+const width = 80, height = 60;
 
 const KeyCodes = {
   enter: 'Enter',
@@ -16,24 +16,39 @@ const KeyCodes = {
   right: 'ArrowRight',
 };
 
-function toDirection(keyCode){
-  switch(keyCode){
-    case KeyCodes.up: return [0,-1];
-    case KeyCodes.down: return [0,1];
-    case KeyCodes.left: return [-1,0];
-    case KeyCodes.right: return [1,0];
-    default: return [];
+function toDirection(keyCode) {
+  switch (keyCode) {
+    case KeyCodes.up:
+      return [0, -1];
+    case KeyCodes.down:
+      return [0, 1];
+    case KeyCodes.left:
+      return [-1, 0];
+    case KeyCodes.right:
+      return [1, 0];
+    default:
+      return [];
   }
 }
 
-const initialSnake = R.repeat(new Point(30, 40), 5);
+const spawnCandy = () => Point.random(width, height);
+const initialSnake = R.repeat(new Point(width / 2, height / 2), 5);
 
-const moveTo = direction => R.pipe(
-  R.dropLast(1),
-  R.converge(R.prepend, [([point]) => point.move(direction).wrap(width, height), R.identity]),
-);
+function move({ snake, candy }, direction) {
+  if (direction.length !== 2) return { snake, candy };
 
-const move = R.flip(R.converge(R.call, [moveTo, R.nthArg(1)]));
+  const nextPoint = snake[0].move(direction).wrap(width, height);
+  snake = R.prepend(nextPoint, snake);
+
+  if (nextPoint.equals(candy)) {
+    snake = R.adjust(p => p.inflate(), 0, snake);
+    candy = spawnCandy();
+  } else {
+    snake = R.dropLast(1, snake);
+  }
+
+  return { snake, candy };
+}
 
 const game = mapPropsStream(() => {
   const { handler: onKeyDown, stream: keyDown$ } = createEventHandler();
@@ -49,14 +64,13 @@ const game = mapPropsStream(() => {
 
   return Rx.Observable.interval(100)
     .withLatestFrom(direction$, (_, direction) => direction)
-    .scan(move, initialSnake)
+    .scan(move, { snake: initialSnake, candy: spawnCandy() })
     .map(snake => ({
-      snake,
+      ...snake,
       onKeyDown,
       capture: Object.values(KeyCodes),
       width,
       height,
-      candy: new Point(5,5),
     }));
 });
 
