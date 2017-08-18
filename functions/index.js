@@ -26,7 +26,7 @@ exports.moveSnake = functions.database.ref('game/players/{playerId}/next')
             if (snake.some(x => next.equals(x))) {
               state = 'ended';
             } else {
-              state = 'running'
+              state = 'running';
             }
             snake = R.prepend(next, snake);
 
@@ -46,7 +46,7 @@ exports.moveSnake = functions.database.ref('game/players/{playerId}/next')
                   snake = snake.slice(0, -1);
                 }
                 return snapshot.ref.update({ state, snake, score });
-              })
+              });
           });
       });
   });
