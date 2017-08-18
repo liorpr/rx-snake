@@ -1,3 +1,9 @@
+function wrap(num, to) {
+  num = num % to;
+  if (num < 0) num+=to;
+  return num;
+}
+
 export default class Point {
   constructor(x, y, size = 1) {
     this.x = x;
@@ -18,7 +24,7 @@ export default class Point {
   }
 
   wrap(width, height) {
-    return new Point((this.x + width) % width, (this.y + height) % height);
+    return new Point(wrap(this.x, width), wrap(this.y, height));
   }
 
   inflate(size = 1.5) {
