@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Snake from './Snake';
 import Dot from './Dot';
-import Point from './utils/Point';
 import GameState from './utils/GameState';
+import pointShape from './pointShape';
 import './Board.css';
 
 const size = 8;
@@ -36,8 +36,8 @@ const Board = ({ snake, candy, state, width, height, score }) => (
 );
 
 Board.propTypes = {
-  snake: PropTypes.arrayOf(PropTypes.instanceOf(Point)).isRequired,
-  candy: PropTypes.instanceOf(Point).isRequired,
+  snake: PropTypes.arrayOf(pointShape).isRequired,
+  candy: pointShape.isRequired,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
 };

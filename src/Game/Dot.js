@@ -1,21 +1,28 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Point from './utils/Point';
+import pointShape from './pointShape';
 
-const Dot = ({ size, point, color }) => (
-  <div style={{
-    width: point.size * size,
-    height: point.size * size,
-    left: point.x * size - (((point.size - 1) / 2) * size),
-    top: point.y * size - (((point.size - 1) / 2) * size),
+const BELLY = 1.5;
+const ADJUST = (BELLY - 1) / 2;
+
+function getStyle({ point: { belly, x, y }, size, color }) {
+  const displaySize =  belly ? BELLY * size : size;
+  const adjustLocation = belly ? ADJUST * size : 0;
+  return {
+    width: displaySize,
+    height: displaySize,
+    left: x * size - adjustLocation,
+    top: y * size - adjustLocation,
     backgroundColor: color,
     position: 'absolute',
     borderRadius: '50%',
-  }} />
-);
+  }
+}
+
+const Dot = props => <div style={getStyle(props)} />;
 
 Dot.propTypes = {
-  point: PropTypes.instanceOf(Point).isRequired,
+  point: pointShape.isRequired,
   size: PropTypes.number,
   color: PropTypes.string, 
 };

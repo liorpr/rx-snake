@@ -1,18 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Dot from './Dot';
-import Point from './utils/Point';
+import pointShape from './pointShape';
 
 const Snake = ({ shape, ...props }) => (
   <div>
     {
-      shape.map((point) => <Dot key={point.uuid} {...props} point={point}/>)
+      shape.map((point, i) => <Dot key={i} {...props} point={point}/>)
     }
   </div>
 );
 
 Snake.propTypes = {
-  shape: PropTypes.arrayOf(PropTypes.instanceOf(Point)).isRequired,
+  shape: PropTypes.arrayOf(pointShape).isRequired,
   size: PropTypes.number,
   color: PropTypes.string,
 };

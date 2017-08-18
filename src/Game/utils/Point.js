@@ -1,5 +1,3 @@
-import uuid from 'uuid/v4';
-
 function wrap(num, to) {
   num = num % to;
   if (num < 0) num+=to;
@@ -7,11 +5,10 @@ function wrap(num, to) {
 }
 
 export default class Point {
-  constructor(x, y, size = 1) {
+  constructor(x, y, belly) {
     this.x = x;
     this.y = y;
-    this.size = size;
-    this.uuid = uuid();
+    this.belly = belly;
   }
 
   static random(width, height) {
@@ -30,8 +27,8 @@ export default class Point {
     return new Point(wrap(this.x, width), wrap(this.y, height));
   }
 
-  inflate(size = 1.5) {
-    return new Point(this.x, this.y, this.size * size);
+  inflate() {
+    return new Point(this.x, this.y, true);
   }
 
   equals(other) {
