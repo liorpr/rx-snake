@@ -1,0 +1,9 @@
+{
+  "name": "functions",
+  "version": "0.0.1",
+  "dependencies": {
+    "firebase-admin": "^4.1.1",
+    "firebase-functions": "^0.5.1",
+    "ramda": "^0.24.1"
+  }
+}
