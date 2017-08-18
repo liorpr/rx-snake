@@ -1,5 +1,5 @@
 import React from 'react';
-import {mapPropsStream, createEventHandler, compose} from 'recompose';
+import {createEventHandler, componentFromStream} from 'recompose';
 import firebase from 'firebase';
 import R from 'ramda';
 import Rx from 'rxjs';
@@ -9,8 +9,11 @@ import Point from './utils/Point';
 import GameState from './utils/GameState';
 import './utils/initFirebase';
 
-const candyRef = firebase.database().ref('game/candy');
-const width = 80, height = 60;
+const gameRef = firebase.database().ref('game');
+const candyRef = gameRef.child('candy');
+const sizeRef = gameRef.child('size');
+
+const BoardWithKeyDown = withKeyDown(Board);
 
 const KeyCodes = {
   enter: 'Enter',
@@ -35,9 +38,7 @@ function toDirection(keyCode) {
   }
 }
 
-const spawnCandy = () => Point.random(width, height);
-
-function initialState() {
+function initialState({ width, height }) {
   return {
     state: GameState.loaded,
     snake: R.repeat(new Point(width / 2, height / 2), 5),
@@ -49,7 +50,7 @@ function detectCollision(snake) {
   return snake.slice(1).some(x => snake[0].equals(x));
 }
 
-function play({ snake, state, score }, [direction, candy]) {
+function play({ snake, state, score }, [direction, candy, { width, height }]) {
   if (state === GameState.ended || direction.length !== 2) return { snake, candy, state, score };
 
   const nextPoint = snake[0].move(direction).wrap(width, height);
@@ -58,7 +59,7 @@ function play({ snake, state, score }, [direction, candy]) {
 
   if (nextPoint.equals(candy)) {
     snake = R.adjust(p => p.inflate(), 0, snake);
-    candy = spawnCandy();
+    candy = Point.random(width, height);
     candyRef.set(candy);
     score++;
   } else {
@@ -75,35 +76,39 @@ function play({ snake, state, score }, [direction, candy]) {
 const candy$ = new Rx.ReplaySubject(1);
 candyRef.on('value', candy => candy$.next(Point.from(candy.val())));
 
-const game = mapPropsStream(() => {
-  const { handler: onKeyDown, stream: keyDown$ } = createEventHandler();
+const size$ = new Rx.ReplaySubject(1);
+sizeRef.on('value', size => size$.next(size.val()));
 
-  const start$ = keyDown$.filter(key => key === KeyCodes.enter)
-    .startWith(1);
+export default componentFromStream(() => {
+  const { handler: onKeyDown, stream: keyDown$ } = createEventHandler();
 
   const direction$ = keyDown$.map(toDirection)
     .filter(d => d.length === 2)
     .startWith([]);
 
-  return start$.switchMap(() => Rx.Observable.interval(100)
+  return size$.first().mergeMapTo(keyDown$.filter(key => key === KeyCodes.enter).startWith(1))
+    .withLatestFrom(size$, (_, size) => initialState(size))
+    .switchMap(initialState => Rx.Observable.interval(100)
       .withLatestFrom(direction$, (_, direction) => direction)
       .scan((prev, next) => {
         if (prev[0] === next[0] || prev[1] === next[1]) return prev;
         return next;
       })
-      .withLatestFrom(candy$, (direction, candy) => [direction, candy])
-      .scan(play, initialState())
+      .withLatestFrom(candy$, size$, Array.of)
+      .scan(play, initialState)
     )
-    .map(game => ({
+    .withLatestFrom(size$, Array.of)
+    .map(([game, size]) => ({
       ...game,
+      ...size,
       onKeyDown,
       capture: Object.values(KeyCodes),
-      width,
-      height,
-    }));
+    }))
+    .startWith({})
+    .map(props => {
+      if ('snake' in props) {
+        return <BoardWithKeyDown {...props}/>;
+      }
+      return <h1>Loading...</h1>;
+    })
 });
-
-export default compose(
-  game,
-  withKeyDown
-)(Board)
