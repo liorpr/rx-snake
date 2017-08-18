@@ -41,7 +41,10 @@ function toDirection(keyCode) {
 function initialState({ width, height }) {
   return {
     state: GameState.loaded,
-    snake: R.repeat(new Point(width / 2, height / 2), 5),
+    snake: R.map(
+      () =>  new Point(width / 2, height / 2),
+      R.range(0, 5)
+    ),
     score: 0,
   }
 }
@@ -60,7 +63,7 @@ function play({ snake, state, score }, [direction, candy, { width, height }]) {
   if (nextPoint.equals(candy)) {
     snake = R.adjust(p => p.inflate(), 0, snake);
     candy = Point.random(width, height);
-    candyRef.set(candy);
+    candyRef.set(R.pick(['x', 'y'], candy));
     score++;
   } else {
     snake = R.dropLast(1, snake);
