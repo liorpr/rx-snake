@@ -53,8 +53,8 @@ function detectCollision(snake) {
   return snake.slice(1).some(x => snake[0].equals(x));
 }
 
-function play({ snake, state, score }, [direction, candy, { width, height }]) {
-  if (state === GameState.ended || direction.length !== 2) return { snake, candy, state, score };
+function play({ snake, state, score, playerRef }, [direction, candy, { width, height }]) {
+  if (state === GameState.ended || direction.length !== 2) return { snake, candy, state, score, playerRef };
 
   const nextPoint = snake[0].move(direction).wrap(width, height);
   snake = R.prepend(nextPoint, snake);
@@ -65,15 +65,20 @@ function play({ snake, state, score }, [direction, candy, { width, height }]) {
     candy = Point.random(width, height);
     candyRef.set(R.pick(['x', 'y'], candy));
     score++;
+    playerRef = playerRef || gameRef.child('players').push();
+    playerRef.update({score, state});
   } else {
     snake = R.dropLast(1, snake);
   }
 
   if (detectCollision(snake)) {
     state = GameState.ended;
+    if (playerRef) {
+      playerRef.update({state});
+    }
   }
 
-  return { snake, candy, state, score };
+  return { snake, candy, state, score, playerRef };
 }
 
 const candy$ = new Rx.ReplaySubject(1);
