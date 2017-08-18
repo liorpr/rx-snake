@@ -9,6 +9,10 @@ export default class Point {
     return new Point(~~(Math.random() * width), ~~(Math.random() * height));
   }
 
+  static from({x,y, size}) {
+    return new Point(x, y, size);
+  }
+
   move([x = 0, y = 0]) {
     return new Point(this.x + x, this.y + y);
   }

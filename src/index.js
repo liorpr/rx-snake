@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom';
 import { setObservableConfig } from 'recompose';
 import { Observable } from 'rxjs';
 import './index.css';
-import App from './App';
+import Game from './Game';
 
 setObservableConfig({
   fromESObservable: Observable.from,
 });
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(<Game />, document.getElementById('root'));
