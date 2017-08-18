@@ -66,15 +66,21 @@ function play({ snake, state, score, playerRef }, [direction, candy, { width, he
     candyRef.set(R.pick(['x', 'y'], candy));
     score++;
     playerRef = playerRef || gameRef.child('players').push();
-    playerRef.update({score, state});
+    playerRef.update({score});
   } else {
     snake = R.dropLast(1, snake);
   }
 
   if (detectCollision(snake)) {
     state = GameState.ended;
+
     if (playerRef) {
-      playerRef.update({state});
+      playerRef.remove();
+      playerRef = null;
+    }
+
+    if (score > 0) {
+      gameRef.child('ended').push({score});
     }
   }
 
