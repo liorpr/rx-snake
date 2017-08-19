@@ -5,7 +5,7 @@ function wrap(num, to) {
 }
 
 export default class Point {
-  constructor(x, y, belly) {
+  constructor(x, y, belly = false) {
     this.x = x;
     this.y = y;
     this.belly = belly;
