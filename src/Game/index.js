@@ -94,7 +94,16 @@ export default componentFromStream(() => {
 
   const direction$ = keyDown$.map(toDirection)
     .filter(d => d.length === 2)
-    .startWith([]);
+    .startWith([])
+    .scan((prev, next) => {
+      if ((prev[0] === next[0] || prev[1] === next[1])) return prev;
+      return next;
+    })
+    .bufferTime(100)
+    .mergeScan((prev, next) => {
+      if (next.length === 0) return Rx.Observable.of(prev);
+      return Rx.Observable.of(...next);
+    });
 
   const start$ = keyDown$.filter(key => key === KeyCodes.enter)
     .startWith(1);
@@ -109,12 +118,7 @@ export default componentFromStream(() => {
         const playerRef = gameRef.child('players').push(initialGame);
         const current = playerRef.key;
 
-        return Rx.Observable.timer(0, 100)
-          .withLatestFrom(direction$, (_, direction) => direction)
-          .scan((prev, next) => {
-            if ((prev[0] === next[0] || prev[1] === next[1])) return prev;
-            return next;
-          })
+        return direction$
           .withLatestFrom(candy$, size$, pause$, Array.of)
           .scan(play, initialGame)
           .distinctUntilChanged(R.equals)
