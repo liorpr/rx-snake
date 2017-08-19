@@ -17,6 +17,7 @@ const BoardWithKeyDown = withKeyDown(Board);
 
 const KeyCodes = {
   enter: 'Enter',
+  space: 'Space',
   up: 'ArrowUp',
   down: 'ArrowDown',
   left: 'ArrowLeft',
@@ -38,11 +39,11 @@ function toDirection(keyCode) {
   }
 }
 
-function initialState({ width, height }) {
+function initGame({ width, height }) {
   return {
     state: GameState.loaded,
     snake: R.map(
-      () =>  new Point(width / 2, height / 2),
+      () => new Point(width / 2, height / 2),
       R.range(0, 5)
     ),
     score: 0,
@@ -53,8 +54,15 @@ function detectCollision(snake) {
   return snake.slice(1).some(x => snake[0].equals(x));
 }
 
-function play({ snake, state, score, playerRef }, [direction, candy, { width, height }]) {
-  if (state === GameState.ended || direction.length !== 2) return { snake, candy, state, score, playerRef };
+function play({ snake, state, score }, [direction, candy, { width, height }, pause]) {
+  const result = () => ({ snake, candy, state, score });
+
+  if (direction.length !== 2) return result();
+
+  if (pause) {
+    state = GameState.paused;
+    return result();
+  }
 
   const nextPoint = snake[0].move(direction).wrap(width, height);
   snake = R.prepend(nextPoint, snake);
@@ -73,12 +81,7 @@ function play({ snake, state, score, playerRef }, [direction, candy, { width, he
     state = GameState.ended;
   }
 
-  if (score > 0) {
-    playerRef = playerRef || gameRef.child('players').push();
-    playerRef.update({ snake: snake.map(R.pick(['x', 'y', 'size'])), score, state })
-  }
-
-  return { snake, candy, state, score, playerRef };
+  return result();
 }
 
 const candy$ = new Rx.ReplaySubject(1);
@@ -94,29 +97,40 @@ export default componentFromStream(() => {
     .filter(d => d.length === 2)
     .startWith([]);
 
-  return size$.first().mergeMapTo(keyDown$.filter(key => key === KeyCodes.enter).startWith(1))
-    .withLatestFrom(size$, (_, size) => initialState(size))
-    .switchMap(initialState => Rx.Observable.interval(100)
-      .withLatestFrom(direction$, (_, direction) => direction)
-      .scan((prev, next) => {
-        if (prev[0] === next[0] || prev[1] === next[1]) return prev;
-        return next;
+  const start$ = keyDown$.filter(key => key === KeyCodes.enter)
+    .startWith(1);
+
+  const pause$ = keyDown$.filter(key => key === KeyCodes.space)
+    .startWith(1)
+    .scan((pause, _) => !pause, true);
+
+  return size$.first().mergeMapTo(start$)
+    .switchMap(() =>
+      size$.first().map(initGame).mergeMap(initialGame => {
+        const playerRef = gameRef.child('players').push(initialGame);
+
+        return Rx.Observable.timer(0, 100)
+          .withLatestFrom(direction$, (_, direction) => direction)
+          .scan((prev, next) => {
+            if ((prev[0] === next[0] || prev[1] === next[1])) return prev;
+            return next;
+          })
+          .withLatestFrom(candy$, size$, pause$, Array.of)
+          .scan(play, initialGame)
+          .distinctUntilChanged(R.equals)
+          .do(({ snake, score, state }) =>
+            playerRef.update({ snake: snake.map(R.pick(['x', 'y', 'size'])), score, state })
+          )
+          .takeWhile(({ state }) => state !== GameState.ended)
+          .finally(() => playerRef.child('state').set(GameState.ended));
       })
-      .withLatestFrom(candy$, size$, Array.of)
-      .scan(play, initialState)
     )
-    .withLatestFrom(size$, Array.of)
-    .map(([game, size]) => ({
-      ...game,
-      ...size,
-      onKeyDown,
-      capture: Object.values(KeyCodes),
-    }))
-    .startWith({})
-    .map(props => {
-      if ('snake' in props) {
-        return <BoardWithKeyDown {...props}/>;
-      }
-      return <h1>Loading...</h1>;
-    })
+    .withLatestFrom(size$, (game, size) => (
+      <BoardWithKeyDown
+        {...game}
+        {...size}
+        onKeyDown={onKeyDown}
+        capture={Object.values(KeyCodes)}/>
+    ))
+    .startWith(<h1>Loading...</h1>)
 });
