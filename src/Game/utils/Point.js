@@ -1,3 +1,5 @@
+import uuid from 'uuid/v4';
+
 function wrap(num, to) {
   num = num % to;
   if (num < 0) num+=to;
@@ -9,6 +11,7 @@ export default class Point {
     this.x = x;
     this.y = y;
     this.belly = belly;
+    this.uuid = uuid();
   }
 
   static random(width, height) {

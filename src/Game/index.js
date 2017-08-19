@@ -55,9 +55,8 @@ function detectCollision(snake) {
 }
 
 function play({ snake, state, score }, [direction, candy, { width, height }, pause]) {
-  const result = () => ({ snake, candy, state, score });
-
-  if (direction.length !== 2) return result();
+  const result = () => ({ snake, state, score, candy });
+  if (state === GameState.ended || direction.length !== 2) return result();
 
   if (pause) {
     state = GameState.paused;
@@ -119,9 +118,8 @@ export default componentFromStream(() => {
           .scan(play, initialGame)
           .distinctUntilChanged(R.equals)
           .do(({ snake, score, state }) =>
-            playerRef.update({ snake: snake.map(R.pick(['x', 'y', 'size'])), score, state })
+            playerRef.update({ snake: snake.map(R.pick(['x', 'y', 'belly'])), score, state })
           )
-          .takeWhile(({ state }) => state !== GameState.ended)
           .finally(() => playerRef.child('state').set(GameState.ended));
       })
     )
