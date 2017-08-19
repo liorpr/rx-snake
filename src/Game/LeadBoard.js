@@ -29,7 +29,6 @@ const Score = ({ playerId, score, highlight }) => (
 export default componentFromStream(props$ => {
   return props$.first().mergeMapTo(topPlayers$)
     .map(mapScores)
-    .do(x => console.log('top', x))
     .withLatestFrom(props$, (top, {current}) => (
       <div>
         {
