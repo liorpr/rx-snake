@@ -4,6 +4,7 @@ import Snake from './Snake';
 import Dot from './Dot';
 import GameState from './utils/GameState';
 import pointShape from './pointShape';
+import LeadBoard from './LeadBoard';
 import './Board.css';
 
 const size = 8;
@@ -15,7 +16,7 @@ const Message = ({text}) => (
   }}>{text}</div>
 );
 
-const Board = ({ snake, candy, state, width, height, score }) => (
+const Board = ({ snake, candy, state, width, height, score, current }) => (
   <div className="App">
     <h2>Score: {score}</h2>
     <div style={{
@@ -32,6 +33,7 @@ const Board = ({ snake, candy, state, width, height, score }) => (
       { state === GameState.loaded ? <Message text="Press any arrow to move"/> : null }
       { state === GameState.ended ? <Message text="GAME ENDED"/> : null }
     </div>
+    <LeadBoard current={current}/>
   </div>
 );
 

@@ -107,6 +107,7 @@ export default componentFromStream(() => {
     .switchMap(() =>
       size$.first().map(initGame).mergeMap(initialGame => {
         const playerRef = gameRef.child('players').push(initialGame);
+        const current = playerRef.key;
 
         return Rx.Observable.timer(0, 100)
           .withLatestFrom(direction$, (_, direction) => direction)
@@ -120,6 +121,7 @@ export default componentFromStream(() => {
           .do(({ snake, score, state }) =>
             playerRef.update({ snake: snake.map(R.pick(['x', 'y', 'belly'])), score, state })
           )
+          .map(R.assoc('current', current))
           .finally(() => playerRef.child('state').set(GameState.ended));
       })
     )
