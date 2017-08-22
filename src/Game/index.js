@@ -1,10 +1,11 @@
 import React from 'react';
-import {createEventHandler, componentFromStream} from 'recompose';
+import {createEventHandler, componentFromStream ,compose } from 'recompose';
 import firebase from 'firebase';
 import R from 'ramda';
 import Rx from 'rxjs';
 import Board from './Board';
 import withKeyDown from "./hoc/withKeyDown";
+import withSwipe from './hoc/withSwipe';
 import Point from './utils/Point';
 import GameState from './utils/GameState';
 import './utils/initFirebase';
@@ -13,7 +14,7 @@ const gameRef = firebase.database().ref('game');
 const candyRef = gameRef.child('candy');
 const sizeRef = gameRef.child('size');
 
-const BoardWithKeyDown = withKeyDown(Board);
+const BoardWithKeyDown = compose(withKeyDown, withSwipe)(Board);
 
 const KeyCodes = {
   enter: 'Enter',
@@ -24,15 +25,26 @@ const KeyCodes = {
   right: 'ArrowRight',
 };
 
+const SwipeCodes = {
+ up: 'SwipedUp',
+ down: 'SwipedDown',
+ left: 'SwipedLeft',
+ right: 'SwipedRight',
+};
+
 function toDirection(keyCode) {
   switch (keyCode) {
     case KeyCodes.up:
+    case SwipeCodes.up:
       return [0, -1];
     case KeyCodes.down:
+    case SwipeCodes.down:
       return [0, 1];
     case KeyCodes.left:
+    case SwipeCodes.left:
       return [-1, 0];
     case KeyCodes.right:
+    case SwipeCodes.right:
       return [1, 0];
     default:
       return [];
@@ -134,6 +146,7 @@ export default componentFromStream(() => {
         {...game}
         {...size}
         onKeyDown={onKeyDown}
+        onSwipe={onKeyDown}
         capture={Object.values(KeyCodes)}/>
     ))
     .startWith(<h1>Loading...</h1>)
