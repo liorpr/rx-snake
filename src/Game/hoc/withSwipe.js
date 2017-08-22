@@ -4,10 +4,10 @@ import Swipeable from 'react-swipeable';
 export default Component => ({onSwipe, ...props}) => (
   <Swipeable
     style={{touchAction: 'none'}}
-    onSwipedUp={() => onSwipe('SwipedUp')}
-    onSwipedRight={() => onSwipe('SwipedRight')}
-    onSwipedDown={() => onSwipe('SwipedDown')}
-    onSwipedLeft={() => onSwipe('SwipedLeft')}
+    onSwipingUp={() => onSwipe('SwipeUp')}
+    onSwipingRight={() => onSwipe('SwipeRight')}
+    onSwipingDown={() => onSwipe('SwipeDown')}
+    onSwipingLeft={() => onSwipe('SwipeLeft')}
     trackMouse
   >
     <Component {...props}/>

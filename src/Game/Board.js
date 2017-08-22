@@ -29,7 +29,7 @@ const Board = ({ snake, candy, state, width, height, score, current, direction, 
       <h2 style={{ opacity: 0.2 }}>Score: {score}</h2>
       <Snake shape={snake} size={size} direction={direction}/>
       <Candy point={candy} size={size}/>
-      {state === GameState.loaded ? <Message text="Press any arrow to move"/> : null}
+      {state === GameState.loaded ? <Message text="Swipe or Press any arrow to move"/> : null}
       {state === GameState.ended ? <Message text="GAME ENDED"/> : null}
     </div>
   </div>

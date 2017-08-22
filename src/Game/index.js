@@ -26,10 +26,10 @@ const KeyCodes = {
 };
 
 const SwipeCodes = {
- up: 'SwipedUp',
- down: 'SwipedDown',
- left: 'SwipedLeft',
- right: 'SwipedRight',
+ up: 'SwipeUp',
+ down: 'SwipeDown',
+ left: 'SwipeLeft',
+ right: 'SwipeRight',
 };
 
 function toDirection(keyCode) {
@@ -112,6 +112,7 @@ export default componentFromStream(() => {
       return next;
     })
     .bufferTime(100)
+    .map(R.dropRepeats)
     .mergeScan((prev, next) => {
       if (next.length === 0) return Rx.Observable.of(prev);
       return Rx.Observable.of(...next);
@@ -135,7 +136,7 @@ export default componentFromStream(() => {
           .scan(play, initialGame)
           .distinctUntilChanged(R.equals)
           .do(({ snake, score, state }) =>
-            playerRef.update({ snake: snake.map(R.pick(['x', 'y', 'belly'])), score, state })
+            playerRef.update({ snake: snake.map(R.pick(['x', 'y', 'belly'])), score, state, updated: ~~((new Date()).getTime() / 1000) })
           )
           .map(R.assoc('current', current))
           .finally(() => playerRef.child('state').set(GameState.ended));
