@@ -4,7 +4,7 @@ import firebase from 'firebase';
 import R from 'ramda';
 import Rx from 'rxjs';
 import Board from './Board';
-import withKeyDown from "./withKeyDown";
+import withKeyDown from "./hoc/withKeyDown";
 import Point from './utils/Point';
 import GameState from './utils/GameState';
 import './utils/initFirebase';
@@ -43,7 +43,7 @@ function initGame({ width, height }) {
   return {
     state: GameState.loaded,
     snake: R.map(
-      () => new Point(width / 2, height / 2),
+      () => new Point(~~(width / 2), ~~(height / 2)),
       R.range(0, 5)
     ),
     score: 0,
@@ -55,7 +55,7 @@ function detectCollision(snake) {
 }
 
 function play({ snake, state, score }, [direction, candy, { width, height }, pause]) {
-  const result = () => ({ snake, state, score, candy });
+  const result = () => ({ snake, state, score, candy, direction });
   if (state === GameState.ended || direction.length !== 2) return result();
 
   if (pause) {
@@ -110,7 +110,7 @@ export default componentFromStream(() => {
 
   const pause$ = keyDown$.filter(key => key === KeyCodes.space)
     .startWith(1)
-    .scan((pause, _) => !pause, true);
+    .scan(pause => !pause, true);
 
   return size$.first().mergeMapTo(start$)
     .switchMap(() =>

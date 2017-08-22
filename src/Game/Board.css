@@ -3,6 +3,15 @@
   display: flex;
   align-items: center;
   flex-direction: column;
+  background: black;
+  color: cadetblue;
+}
+
+.Board {
+  background: white;
+  border-color: cadetblue;
+  border-width: 4px;
+  position: relative;
 }
 
 .App-logo {

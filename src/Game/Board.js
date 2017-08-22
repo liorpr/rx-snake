@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Snake from './Snake';
-import Dot from './Dot';
+import Candy from './Candy';
 import GameState from './utils/GameState';
 import pointShape from './pointShape';
 import LeadBoard from './LeadBoard';
 import './Board.css';
 
-const size = 8;
+const size = 16;
 
 const Message = ({text}) => (
   <div style={{
@@ -16,20 +16,15 @@ const Message = ({text}) => (
   }}>{text}</div>
 );
 
-const Board = ({ snake, candy, state, width, height, score, current }) => (
+const Board = ({ snake, candy, state, width, height, score, current, direction }) => (
   <div className="App">
     <h2>Score: {score}</h2>
-    <div style={{
+    <div className="Board" style={{
       width: width * size,
       height: height * size,
-      backgroundColor: 'black',
-      borderColor: 'white',
-      color: 'white',
-      borderWidth: 4,
-      position: 'relative'
     }}>
-      <Snake shape={snake} size={size} color="green" />
-      <Dot point={candy} size={size} color="orange" />
+      <Snake shape={snake} size={size} direction={direction} />
+      <Candy point={candy} size={size} />
       { state === GameState.loaded ? <Message text="Press any arrow to move"/> : null }
       { state === GameState.ended ? <Message text="GAME ENDED"/> : null }
     </div>
