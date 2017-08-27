@@ -15,8 +15,8 @@ const Message = ({ text }) => (
 );
 
 const addSize = mapProps(({ ...props, width, height }) => {
-  const w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-  const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+  const w = Math.min(document.documentElement.clientWidth, window.innerWidth || Infinity);
+  const h = Math.min(document.documentElement.clientHeight, window.innerHeight || Infinity);
   return { ...props, size: Math.min(16, ~~Math.min(w / width, h / height)) };
 });
 
