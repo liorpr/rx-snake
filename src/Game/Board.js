@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { mapProps } from 'recompose';
 import Snake from './Snake';
 import Candy from './Candy';
 import GameState from './utils/GameState';
@@ -13,12 +12,6 @@ const Message = ({ text }) => (
     position: 'relative',
   }}>{text}</div>
 );
-
-const addSize = mapProps(({ ...props, width, height }) => {
-  const w = Math.min(document.documentElement.clientWidth, window.innerWidth || Infinity);
-  const h = Math.min(document.documentElement.clientHeight, window.innerHeight || Infinity);
-  return { ...props, size: Math.min(16, ~~Math.min(w / width, h / height)) };
-});
 
 const Board = ({ snake, candy, state, width, height, score, current, direction, size }) => (
   <div className="App">
@@ -42,4 +35,4 @@ Board.propTypes = {
   height: PropTypes.number.isRequired,
 };
 
-export default addSize(Board);
+export default Board;

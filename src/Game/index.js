@@ -1,5 +1,4 @@
-import React from 'react';
-import { createEventHandler, componentFromStream, flattenProp, compose } from 'recompose';
+import { createEventHandler, mapPropsStream, flattenProp, compose } from 'recompose';
 import firebase from 'firebase';
 import R from 'ramda';
 import { Observable } from 'rxjs';
@@ -7,44 +6,28 @@ import Board from './Board';
 import withKeyDown from "./hoc/withKeyDown";
 import withSwipe from './hoc/withSwipe';
 import withFirebase from './hoc/withFirebase';
+import withWindowSize from './hoc/withWindowSize';
 import Point from './utils/Point';
 import GameState from './utils/GameState';
+import KeyCodes from './utils/KeyCodes';
 import './utils/initFirebase';
 
 const playersRef = firebase.database().ref('game/players');
 const candyRef = firebase.database().ref('game/config/candy');
 
-const BoardWithKeyDown = compose(withKeyDown, withSwipe)(Board);
-
-const KeyCodes = {
-  enter: 'Enter',
-  space: 'Space',
-  up: 'ArrowUp',
-  down: 'ArrowDown',
-  left: 'ArrowLeft',
-  right: 'ArrowRight',
-};
-
-const SwipeCodes = {
-  up: 'SwipeUp',
-  down: 'SwipeDown',
-  left: 'SwipeLeft',
-  right: 'SwipeRight',
-};
-
 function toDirection(keyCode) {
   switch (keyCode) {
-    case KeyCodes.up:
-    case SwipeCodes.up:
+    case KeyCodes.arrowUp:
+    case KeyCodes.swipeUp:
       return [0, -1];
-    case KeyCodes.down:
-    case SwipeCodes.down:
+    case KeyCodes.arrowDown:
+    case KeyCodes.swipeDown:
       return [0, 1];
-    case KeyCodes.left:
-    case SwipeCodes.left:
+    case KeyCodes.arrowLeft:
+    case KeyCodes.swipeLeft:
       return [-1, 0];
-    case KeyCodes.right:
-    case SwipeCodes.right:
+    case KeyCodes.arrowRight:
+    case KeyCodes.swipeRight:
       return [1, 0];
     default:
       return [];
@@ -95,7 +78,15 @@ function play({ snake, state, score }, [direction, candy, { width, height }, pau
   return result();
 }
 
-const Game = componentFromStream(props$ => {
+function getPointSize(gameSize, windowSize) {
+  const width = windowSize.width / gameSize.width;
+  const height = windowSize.height / gameSize.height;
+  const MAX_SIZE = 16;
+
+  return Math.min(MAX_SIZE, ~~Math.min(width, height));
+}
+
+const game = mapPropsStream(props$ => {
   const { handler: onKeyDown, stream: keyDown$ } = createEventHandler();
 
   const sharedProps$ = props$.publishReplay(1).refCount();
@@ -104,6 +95,9 @@ const Game = componentFromStream(props$ => {
     .distinctUntilChanged(R.equals);
 
   const gameSize$ = sharedProps$.pluck('size')
+    .distinctUntilChanged(R.equals);
+
+  const windowSize$ = sharedProps$.pluck('windowSize')
     .distinctUntilChanged(R.equals);
 
   const direction$ = keyDown$.map(toDirection)
@@ -124,43 +118,47 @@ const Game = componentFromStream(props$ => {
     .startWith(1)
     .scan(pause => !pause, true);
 
-  const play$ = gameSize$.first().map(initGame).mergeMap(initialGame => {
-    const playerRef = playersRef.push(initialGame);
-    const current = playerRef.key;
+  const play$ = gameSize$.first().map(initGame)
+    .mergeMap(initialGame => {
+      const playerRef = playersRef.push(initialGame);
+      const current = playerRef.key;
 
-    return direction$
-      .withLatestFrom(candy$, gameSize$, pause$, Array.of)
-      .scan(play, initialGame)
-      .distinctUntilChanged(R.equals)
-      .do(({ snake, score, state }) =>
-        playerRef.update({
-          snake: snake.map(R.pick(['x', 'y', 'belly'])),
-          score,
-          state,
-          updated: ~~((new Date()).getTime() / 1000)
-        })
-      )
-      .map(R.assoc('current', current))
-      .finally(() => playerRef.child('state').set(GameState.ended));
-  });
+      return direction$
+        .withLatestFrom(candy$, gameSize$, pause$, Array.of)
+        .scan(play, initialGame)
+        .distinctUntilChanged(R.equals)
+        .do(({ snake, score, state }) =>
+          playerRef.update({
+            snake: snake.map(R.pick(['x', 'y', 'belly'])),
+            score,
+            state,
+            updated: ~~((new Date()).getTime() / 1000)
+          })
+        )
+        .map(R.assoc('current', current))
+        .finally(() => playerRef.child('state').set(GameState.ended));
+    });
 
   const game$ = keyDown$.filter(key => key === KeyCodes.enter)
     .startWith(1)
     .switchMapTo(play$);
 
-  return Observable.combineLatest(game$, gameSize$)
-    .map(([game, gameSize]) => (
-      <BoardWithKeyDown
-        {...game}
-        {...gameSize}
-        onKeyDown={onKeyDown}
-        onSwipe={onKeyDown}
-        capture={Object.values(KeyCodes)}/>
-    ))
-    .startWith(<h1>Loading...</h1>)
+  return Observable.combineLatest(game$, gameSize$, windowSize$)
+    .map(([game, gameSize, windowSize]) => ({
+      ...game,
+      ...gameSize,
+      size: getPointSize(gameSize, windowSize),
+      onKeyDown,
+      onSwipe: onKeyDown,
+      capture: Object.values(KeyCodes),
+    }));
 });
 
 export default compose(
   withFirebase('game/config', 'config'),
   flattenProp('config'),
-)(Game)
+  withWindowSize,
+  game,
+  withKeyDown,
+  withSwipe,
+)(Board)
