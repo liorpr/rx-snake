@@ -1,18 +1,18 @@
 import React from 'react';
-import {createEventHandler, componentFromStream ,compose } from 'recompose';
+import { createEventHandler, componentFromStream, flattenProp, compose } from 'recompose';
 import firebase from 'firebase';
 import R from 'ramda';
-import Rx from 'rxjs';
+import { Observable } from 'rxjs';
 import Board from './Board';
 import withKeyDown from "./hoc/withKeyDown";
 import withSwipe from './hoc/withSwipe';
+import withFirebase from './hoc/withFirebase';
 import Point from './utils/Point';
 import GameState from './utils/GameState';
 import './utils/initFirebase';
 
-const gameRef = firebase.database().ref('game');
-const candyRef = gameRef.child('candy');
-const sizeRef = gameRef.child('size');
+const playersRef = firebase.database().ref('game/players');
+const candyRef = firebase.database().ref('game/config/candy');
 
 const BoardWithKeyDown = compose(withKeyDown, withSwipe)(Board);
 
@@ -26,10 +26,10 @@ const KeyCodes = {
 };
 
 const SwipeCodes = {
- up: 'SwipeUp',
- down: 'SwipeDown',
- left: 'SwipeLeft',
- right: 'SwipeRight',
+  up: 'SwipeUp',
+  down: 'SwipeDown',
+  left: 'SwipeLeft',
+  right: 'SwipeRight',
 };
 
 function toDirection(keyCode) {
@@ -95,14 +95,16 @@ function play({ snake, state, score }, [direction, candy, { width, height }, pau
   return result();
 }
 
-const candy$ = new Rx.ReplaySubject(1);
-candyRef.on('value', candy => candy$.next(Point.from(candy.val())));
-
-const size$ = new Rx.ReplaySubject(1);
-sizeRef.on('value', size => size$.next(size.val()));
-
-export default componentFromStream(() => {
+const Game = componentFromStream(props$ => {
   const { handler: onKeyDown, stream: keyDown$ } = createEventHandler();
+
+  const sharedProps$ = props$.publishReplay(1).refCount();
+
+  const candy$ = sharedProps$.pluck('candy')
+    .distinctUntilChanged(R.equals);
+
+  const gameSize$ = sharedProps$.pluck('size')
+    .distinctUntilChanged(R.equals);
 
   const direction$ = keyDown$.map(toDirection)
     .filter(d => d.length === 2)
@@ -114,41 +116,51 @@ export default componentFromStream(() => {
     .bufferTime(100)
     .map(R.dropRepeats)
     .mergeScan((prev, next) => {
-      if (next.length === 0) return Rx.Observable.of(prev);
-      return Rx.Observable.of(...next);
+      if (next.length === 0) return Observable.of(prev);
+      return Observable.of(...next);
     });
-
-  const start$ = keyDown$.filter(key => key === KeyCodes.enter)
-    .startWith(1);
 
   const pause$ = keyDown$.filter(key => key === KeyCodes.space)
     .startWith(1)
     .scan(pause => !pause, true);
 
-  return size$.first().mergeMapTo(start$)
-    .switchMap(() =>
-      size$.first().map(initGame).mergeMap(initialGame => {
-        const playerRef = gameRef.child('players').push(initialGame);
-        const current = playerRef.key;
+  const play$ = gameSize$.first().map(initGame).mergeMap(initialGame => {
+    const playerRef = playersRef.push(initialGame);
+    const current = playerRef.key;
 
-        return direction$
-          .withLatestFrom(candy$, size$, pause$, Array.of)
-          .scan(play, initialGame)
-          .distinctUntilChanged(R.equals)
-          .do(({ snake, score, state }) =>
-            playerRef.update({ snake: snake.map(R.pick(['x', 'y', 'belly'])), score, state, updated: ~~((new Date()).getTime() / 1000) })
-          )
-          .map(R.assoc('current', current))
-          .finally(() => playerRef.child('state').set(GameState.ended));
-      })
-    )
-    .withLatestFrom(size$, (game, size) => (
+    return direction$
+      .withLatestFrom(candy$, gameSize$, pause$, Array.of)
+      .scan(play, initialGame)
+      .distinctUntilChanged(R.equals)
+      .do(({ snake, score, state }) =>
+        playerRef.update({
+          snake: snake.map(R.pick(['x', 'y', 'belly'])),
+          score,
+          state,
+          updated: ~~((new Date()).getTime() / 1000)
+        })
+      )
+      .map(R.assoc('current', current))
+      .finally(() => playerRef.child('state').set(GameState.ended));
+  });
+
+  const game$ = keyDown$.filter(key => key === KeyCodes.enter)
+    .startWith(1)
+    .switchMapTo(play$);
+
+  return Observable.combineLatest(game$, gameSize$)
+    .map(([game, gameSize]) => (
       <BoardWithKeyDown
         {...game}
-        {...size}
+        {...gameSize}
         onKeyDown={onKeyDown}
         onSwipe={onKeyDown}
         capture={Object.values(KeyCodes)}/>
     ))
     .startWith(<h1>Loading...</h1>)
 });
+
+export default compose(
+  withFirebase('game/config', 'config'),
+  flattenProp('config'),
+)(Game)
