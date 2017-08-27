@@ -1,9 +1,9 @@
 import { lifecycle } from 'recompose';
-import Rx from 'rx-dom';
+import { Observable } from 'rxjs';
 
 export default lifecycle({
   componentDidMount() {
-    this.disposable = Rx.DOM.keydown(document.body)
+    this.disposable = Observable.fromEvent(document, 'keydown')
       .filter(({code}) => this.props.capture.includes(code))
       .do(e => { e.preventDefault(); e.stopPropagation(); })
       .map(e => e.code)
