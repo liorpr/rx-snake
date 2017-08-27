@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import pointShape from './pointShape';
+import pointShape from './utils/pointShape';
 import withLocation from './hoc/withLocation';
 import candy from './resources/candy.png';
 

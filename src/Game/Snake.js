@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { mapProps, compose, branch } from 'recompose';
-import pointShape from './pointShape';
+import pointShape from './utils/pointShape';
 import withLocation from './hoc/withLocation';
 import snakeHead from './resources/snake_head.png';
 import snakeBody from './resources/snake_body.png';

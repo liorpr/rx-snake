@@ -127,11 +127,12 @@ const game = mapPropsStream(props$ => {
         .withLatestFrom(candy$, gameSize$, pause$, Array.of)
         .scan(play, initialGame)
         .distinctUntilChanged(R.equals)
-        .do(({ snake, score, state }) =>
+        .do(({ snake, score, state, direction }) =>
           playerRef.update({
             snake: snake.map(R.pick(['x', 'y', 'belly'])),
             score,
             state,
+            direction,
             updated: ~~((new Date()).getTime() / 1000)
           })
         )
