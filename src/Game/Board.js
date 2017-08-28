@@ -6,11 +6,12 @@ import Candy from './Candy';
 import Players from './Players';
 import GameState from './utils/GameState';
 import pointShape from './utils/pointShape';
-import { SOLUTO_BLUE } from "../resources/colors";
+import { SOLUTO_BLUE, COLORS } from "../resources/colors";
 
 const Message = glamorous.div({
   top: '50%',
   position: 'relative',
+  fontSize: '3em',
 });
 
 const Score = glamorous.div({
@@ -34,7 +35,7 @@ const Container = glamorous.div(({ width, height, size }) => ({
 const Board = ({ snake, candy, state, width, height, score, current, direction, size }) => (
   <Container {...{ width, height, size }}>
     <Score>{score}</Score>
-    <Players current={current} size={size}/>
+    <Players current={current} size={size} colors={COLORS}/>
     <Snake shape={snake} size={size} direction={direction}/>
     <Candy point={candy} size={size}/>
     {state === GameState.loaded ? <Message>Swipe or Press any arrow to move</Message> : null}

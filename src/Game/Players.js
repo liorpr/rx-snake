@@ -12,11 +12,11 @@ const playersRef = firebase.database()
   .orderByChild('state')
   .equalTo(GameState.running);
 
-const Players = ({ players, ...props }) => (
+const Players = ({ players, colors, ...props }) => (
   <div>
     {
-      Object.entries(players).map(([key, { snake, direction }]) => (
-        <Snake key={key} shape={snake} direction={direction} {...props} />
+      Object.entries(players).map(([key, { snake, direction }], index) => (
+        <Snake key={key} color={colors[index % colors.length]} shape={snake} direction={direction} {...props} />
       ))
     }
   </div>
