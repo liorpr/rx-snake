@@ -161,5 +161,5 @@ export default compose(
   withWindowSize,
   game,
   withKeyDown,
-  withSwipe,
+  withSwipe({display: 'flex', height: '100vh'}),
 )(Board)

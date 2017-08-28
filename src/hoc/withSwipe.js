@@ -1,9 +1,9 @@
 import React from 'react';
 import Swipeable from 'react-swipeable';
 
-export default Component => ({onSwipe, ...props}) => (
+export default (containerStyle = {}) => Component => ({onSwipe, ...props}) => (
   <Swipeable
-    style={{touchAction: 'none'}}
+    style={{touchAction: 'none', ...containerStyle}}
     onSwipingUp={() => onSwipe('SwipeUp')}
     onSwipingRight={() => onSwipe('SwipeRight')}
     onSwipingDown={() => onSwipe('SwipeDown')}
