@@ -8,7 +8,6 @@ export default Component => ({onSwipe, ...props}) => (
     onSwipingRight={() => onSwipe('SwipeRight')}
     onSwipingDown={() => onSwipe('SwipeDown')}
     onSwipingLeft={() => onSwipe('SwipeLeft')}
-    trackMouse
   >
     <Component {...props}/>
   </Swipeable>

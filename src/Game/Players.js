@@ -4,7 +4,7 @@ import { mapPropsStream, createEventHandler, compose, setDisplayName } from 'rec
 import R from 'ramda';
 import { Observable } from 'rxjs';
 import GameState from "./utils/GameState";
-import Snake from './Snake';
+import Snake from '../Snake';
 import './utils/initFirebase';
 
 const playersRef = firebase.database()

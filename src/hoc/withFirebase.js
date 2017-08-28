@@ -1,7 +1,7 @@
 import { createEventHandler, mapPropsStream } from 'recompose';
 import { Observable } from 'rxjs';
 import firebase from 'firebase';
-import '../utils/initFirebase';
+import '../Game/utils/initFirebase';
 
 export default (ref, propName = 'firebaseData') => mapPropsStream(props$ => {
   const { handler: onData, stream: onData$ } = createEventHandler();

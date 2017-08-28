@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Snake from './Snake';
+import Snake from '../Snake';
 import Candy from './Candy';
 import Players from './Players';
 import GameState from './utils/GameState';
