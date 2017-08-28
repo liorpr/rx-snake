@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import glamorous from 'glamorous';
+import Board from '../Board';
 import Snake from '../Snake';
-import Candy from './Candy';
-import Players from './Players';
+import Candy from '../Candy';
+import Players from '../Players';
 import GameState from './utils/GameState';
 import pointShape from './utils/pointShape';
-import { SOLUTO_BLUE, COLORS } from "../resources/colors";
+import { COLORS } from "../resources/colors";
 
 const Message = glamorous.div({
   top: '50%',
@@ -23,31 +24,22 @@ const Score = glamorous.div({
   fontSize: '3em',
 });
 
-const Container = glamorous.div(({ width, height, size }) => ({
-  width: width * size,
-  height: height * size,
-  background: 'white',
-  border: `4px solid ${SOLUTO_BLUE}`,
-  margin: 'auto',
-  position: 'relative'
-}));
-
-const Board = ({ snake, candy, state, width, height, score, current, direction, size }) => (
-  <Container {...{ width, height, size }}>
+const Game = ({ snake, candy, state, width, height, score, current, direction, size }) => (
+  <Board {...{ width, height, size }}>
     <Score>{score}</Score>
     <Players current={current} size={size} colors={COLORS}/>
     <Snake shape={snake} size={size} direction={direction}/>
     <Candy point={candy} size={size}/>
     {state === GameState.loaded ? <Message>Swipe or Press any arrow to move</Message> : null}
     {state === GameState.ended ? <Message>GAME ENDED</Message> : null}
-  </Container>
+  </Board>
 );
 
-Board.propTypes = {
+Game.propTypes = {
   snake: PropTypes.arrayOf(pointShape).isRequired,
   candy: pointShape.isRequired,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
 };
 
-export default Board;
+export default Game;

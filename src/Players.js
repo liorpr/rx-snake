@@ -3,9 +3,9 @@ import firebase from 'firebase';
 import { mapPropsStream, createEventHandler, compose, setDisplayName } from 'recompose';
 import R from 'ramda';
 import { Observable } from 'rxjs';
-import GameState from "./utils/GameState";
-import Snake from '../Snake';
-import './utils/initFirebase';
+import GameState from "./Game/utils/GameState";
+import Snake from './Snake/index';
+import './Game/utils/initFirebase';
 
 const playersRef = firebase.database()
   .ref('game/players')

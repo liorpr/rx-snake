@@ -2,11 +2,12 @@ import { createEventHandler, mapPropsStream, flattenProp, compose } from 'recomp
 import firebase from 'firebase';
 import R from 'ramda';
 import { Observable } from 'rxjs';
-import Board from './Board';
+import Board from './Game';
 import withKeyDown from "../hoc/withKeyDown";
 import withSwipe from '../hoc/withSwipe';
 import withFirebase from '../hoc/withFirebase';
 import withWindowSize from '../hoc/withWindowSize';
+import getPointSize from '../utils/getPointSize';
 import Point from './utils/Point';
 import GameState from './utils/GameState';
 import KeyCodes from './utils/KeyCodes';
@@ -76,14 +77,6 @@ function play({ snake, state, score }, [direction, candy, { width, height }, pau
   }
 
   return result();
-}
-
-function getPointSize(gameSize, windowSize) {
-  const width = windowSize.width / gameSize.width;
-  const height = windowSize.height / gameSize.height;
-  const MAX_SIZE = 16;
-
-  return Math.min(MAX_SIZE, ~~Math.min(width, height));
 }
 
 const game = mapPropsStream(props$ => {
@@ -161,5 +154,5 @@ export default compose(
   withWindowSize,
   game,
   withKeyDown,
-  withSwipe({display: 'flex', height: '100vh'}),
+  withSwipe,
 )(Board)

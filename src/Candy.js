@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import pointShape from './utils/pointShape';
-import withLocation from '../hoc/withLocation';
-import candy from '../resources/candy.png';
+import pointShape from './Game/utils/pointShape';
+import withLocation from './hoc/withLocation';
+import candy from './resources/candy.png';
 
 const Candy = withLocation(({ style }) => <img src={candy} style={style} alt=""/>);
 

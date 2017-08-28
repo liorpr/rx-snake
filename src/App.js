@@ -5,14 +5,16 @@ import {
   Switch,
 } from 'react-router-dom';
 
-import Game from './Game';
 import Home from './Home';
+import OnBoarding from './OnBoarding';
+import Game from './Game';
 
 const App = () => (
   <Router>
     <Switch>
+      <Route exact path="/home" component={Home}/>
       <Route exact path="/play" component={Game} />
-      <Route component={Home}/>
+      <Route component={OnBoarding}/>
     </Switch>
   </Router>
 );
