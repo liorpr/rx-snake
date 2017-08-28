@@ -20,7 +20,14 @@ const Board = ({ snake, candy, state, width, height, score, current, direction, 
       width: width * size,
       height: height * size,
     }}>
-      <h2 style={{ opacity: 0.2 }}>Score: {score}</h2>
+      <div style={{
+        opacity: 0.2,
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        margin: '0.4em',
+        fontSize: '3em',
+      }}>{score}</div>
       <Players current={current} size={size} />
       <Snake shape={snake} size={size} direction={direction}/>
       <Candy point={candy} size={size}/>
