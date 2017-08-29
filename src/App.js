@@ -1,12 +1,9 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import {
-  BrowserRouter as Router,
-  Route,
-  Switch,
-} from 'react-router-dom';
-
+import { Route, Switch } from 'react-router-dom';
+import { ConnectedRouter } from 'react-router-redux';
 import configureStore from './store/configure';
+import browserHistory from './store/browserHistory';
 import getGameConfig from './utils/getGameConfig';
 
 import Home from './Home';
@@ -18,13 +15,13 @@ getGameConfig(store.dispatch);
 
 const App = () => (
   <Provider store={store}>
-    <Router>
+    <ConnectedRouter history={browserHistory}>
       <Switch>
         <Route exact path="/home" component={Home}/>
         <Route exact path="/play" component={Game}/>
         <Route component={OnBoarding}/>
       </Switch>
-    </Router>
+    </ConnectedRouter>
   </Provider>
 );
 

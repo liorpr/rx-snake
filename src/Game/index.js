@@ -33,8 +33,9 @@ function toDirection(keyCode) {
   }
 }
 
-function initGame({ width, height }) {
+function initGame({ name, gameSize: { width, height } }) {
   return {
+    name,
     state: GameState.loaded,
     snake: R.map(
       () => new Point(~~(width / 2), ~~(height / 2)),
@@ -48,7 +49,7 @@ function detectCollision(snake) {
   return snake.slice(1).some(x => snake[0].equals(x));
 }
 
-function play({ snake, state, score }, [direction, candy, { width, height }, pause]) {
+function play({ snake, state, score }, [direction, { candy, gameSize: { width, height } }, pause]) {
   const result = () => ({ snake, state, score, candy, direction });
   if (state === GameState.ended || direction.length !== 2) return result();
 
@@ -82,12 +83,6 @@ const game = mapPropsStream(props$ => {
 
   const sharedProps$ = props$.publishReplay(1).refCount();
 
-  const candy$ = sharedProps$.pluck('candy')
-    .distinctUntilChanged(R.equals);
-
-  const gameSize$ = sharedProps$.pluck('gameSize')
-    .distinctUntilChanged(R.equals);
-
   const direction$ = keyDown$.map(toDirection)
     .filter(d => d.length === 2)
     .startWith([])
@@ -106,13 +101,13 @@ const game = mapPropsStream(props$ => {
     .startWith(1)
     .scan(pause => !pause, true);
 
-  const play$ = gameSize$.first().map(initGame)
+  const play$ = sharedProps$.first().map(initGame)
     .mergeMap(initialGame => {
       const playerRef = playersRef.push(initialGame);
       const current = playerRef.key;
 
       return direction$
-        .withLatestFrom(candy$, gameSize$, pause$, Array.of)
+        .withLatestFrom(sharedProps$, pause$, Array.of)
         .scan(play, initialGame)
         .distinctUntilChanged(R.equals)
         .do(({ snake, score, state, direction }) =>
