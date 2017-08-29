@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import GameState from "./Game/utils/GameState";
 import Snake from './Snake/index';
 import './utils/initFirebase';
+import Point from "./Game/utils/Point";
 
 const playersRef = firebase.database()
   .ref('game/snakes')
@@ -16,7 +17,7 @@ const Players = ({ players, colors, ...props }) => (
   <div>
     {
       Object.entries(players).map(([key, { snake, direction }], index) => (
-        <Snake key={key} color={colors[index % colors.length]} shape={snake} direction={direction} {...props} />
+        <Snake key={key} color={colors[index % colors.length]} shape={snake.map(Point.from)} direction={direction} {...props} />
       ))
     }
   </div>

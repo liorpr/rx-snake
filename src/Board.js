@@ -1,4 +1,3 @@
-import React from 'react';
 import glamorous from 'glamorous';
 import { connect } from 'react-redux';
 import R from 'ramda';
