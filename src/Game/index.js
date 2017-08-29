@@ -1,4 +1,4 @@
-import { createEventHandler, mapPropsStream, compose } from 'recompose';
+import { createEventHandler, mapPropsStream, lifecycle, compose } from 'recompose';
 import { connect } from 'react-redux';
 import firebase from 'firebase';
 import R from 'ramda';
@@ -143,4 +143,9 @@ export default compose(
   game,
   withKeyDown,
   withSwipe,
+  lifecycle({
+    componentDidMount() {
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+  })
 )(Game)

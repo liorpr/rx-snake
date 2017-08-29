@@ -27,6 +27,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
+    "deploy:hosting": "yarn deploy -- --only hosting",
+    "deploy:functions": "firebase deploy --only functions",
     "deploy": "yarn build && firebase deploy"
   }
 }

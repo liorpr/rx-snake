@@ -1,18 +1,31 @@
 import React from 'react';
 import { createEventHandler, mapPropsStream } from 'recompose';
+import R from 'ramda';
 import firebase from 'firebase';
-import './utils/initFirebase';
+import glamorous from 'glamorous';
+import { SOLUTO_BLUE } from "./resources/colors";
+
+const Wrapper = glamorous.div({
+  background: SOLUTO_BLUE,
+  color: 'white',
+});
 
 const Score = ({ name, score }) => (
-  <div>name: {name}, score:{score}</div>
+  <div>{name}: {score}</div>
+);
+
+const renderScores = R.pipe(
+  R.toPairs,
+  R.sort(R.descend(([_, { score}]) => score)),
+  R.map(([playerId, playerData]) => <Score key={playerId} {...playerData}/>)
 );
 
 const LeadBoard = ({ scores }) => (
-  <div>
+  <Wrapper>
     {
-      Object.entries(scores).map(([playerId, playerData]) => <Score key={playerId} {...playerData}/>)
+      renderScores(scores)
     }
-  </div>
+  </Wrapper>
 );
 
 export default mapPropsStream(() => {

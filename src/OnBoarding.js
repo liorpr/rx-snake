@@ -9,30 +9,30 @@ import { SOLUTO_BLUE } from "./resources/colors";
 const Container = glamorous.div({
   display: 'flex',
   flexDirection: 'column',
-  padding: '20vh 0',
-  height: '100vh',
+  padding: '3em 0',
+  height: '100vmin',
   justifyContent: 'space-between',
   alignItems: 'center',
   boxSizing: 'border-box',
-  fontSize: '6vh',
+  fontSize: '6vmin',
   fontWeight: 'bold',
 });
 
 const Input = glamorous.input({
-  fontSize: '6vh',
+  fontSize: '6vmin',
   color: SOLUTO_BLUE,
   borderStyle: 'solid',
   borderColor: SOLUTO_BLUE,
-  borderWidth: '0 0 0.4vh 0',
+  borderWidth: '0 0 0.08em 0',
   ':focus': { outline: 0 },
 });
 
 const Button = glamorous.button({
-  fontSize: '6vh',
+  fontSize: '6vmin',
   color: 'white',
   background: SOLUTO_BLUE,
-  padding: '2vh 15vh',
-  borderRadius: '8vh',
+  padding: '0.3em 2.5em',
+  borderRadius: '1em',
   border: 'none',
   cursor: 'pointer',
   ':focus': { outline: 0 },

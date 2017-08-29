@@ -7,12 +7,18 @@ import Candy from '../Candy';
 import Players from '../Players';
 import GameState from './utils/GameState';
 import pointShape from './utils/pointShape';
-import { COLORS } from "../resources/colors";
+import { SOLUTO_BLUE, COLORS } from "../resources/colors";
+
+const Wrapper = glamorous.div({
+  display: 'flex',
+  height: '100vh',
+  background: SOLUTO_BLUE,
+});
 
 const Message = glamorous.div({
   top: '50%',
   position: 'relative',
-  fontSize: '6vh',
+  fontSize: '6vmin',
 });
 
 const Score = glamorous.div({
@@ -20,19 +26,21 @@ const Score = glamorous.div({
   position: 'absolute',
   bottom: 0,
   right: 0,
-  margin: '0.4em',
-  fontSize: '3em',
+  margin: '0.1em 0.4em',
+  fontSize: '12vmin',
 });
 
 const Game = ({ snake, state, score, current, direction, size }) => (
-  <Board>
-    <Score>{score}</Score>
-    <Players current={current} size={size} colors={COLORS}/>
-    <Snake shape={snake} size={size} direction={direction}/>
-    <Candy />
-    {state === GameState.loaded ? <Message>Swipe or Press any arrow to move</Message> : null}
-    {state === GameState.ended ? <Message>GAME ENDED</Message> : null}
-  </Board>
+  <Wrapper>
+    <Board>
+      <Score>{score}</Score>
+      <Players current={current} size={size} colors={COLORS}/>
+      <Snake shape={snake} size={size} direction={direction}/>
+      <Candy/>
+      {state === GameState.loaded ? <Message>Swipe or Press any arrow to move</Message> : null}
+      {state === GameState.ended ? <Message>GAME ENDED</Message> : null}
+    </Board>
+  </Wrapper>
 );
 
 Game.propTypes = {
