@@ -1,6 +1,6 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import { ConnectedRouter } from 'react-router-redux';
 import configureStore from './store/configure';
 import browserHistory from './store/browserHistory';
@@ -18,7 +18,9 @@ const App = () => (
     <ConnectedRouter history={browserHistory}>
       <Switch>
         <Route exact path="/home" component={Home}/>
-        <Route exact path="/play" component={Game}/>
+        <Route exact path="/play" render={() => (
+          localStorage.getItem('playerId') ? <Game /> : <Redirect to="/" />
+        )}/>
         <Route component={OnBoarding}/>
       </Switch>
     </ConnectedRouter>

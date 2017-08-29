@@ -1,8 +1,9 @@
 import React from 'react';
+import firebase from 'firebase';
+import glamorous from 'glamorous';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { setName } from "./store/reducer";
-import glamorous from 'glamorous';
 import { SOLUTO_BLUE } from "./resources/colors";
 
 const Container = glamorous.div({
@@ -37,12 +38,16 @@ const Button = glamorous.button({
   ':focus': { outline: 0 },
 });
 
-const OnBoarding = ({ name, setName, push }) => (
+const OnBoarding = ({ name, playerId, setName, push }) => (
   <Container>
     <label>What is your good name?</label>
     <Input value={name} onChange={e => setName(e.target.value)}/>
     <Button onClick={() => {
-      localStorage.setItem('name', name);
+      firebase.database().ref('game/players')
+        .child(playerId)
+        .child('name')
+        .set(name);
+
       push('/play');
     }}>Game on!</Button>
   </Container>

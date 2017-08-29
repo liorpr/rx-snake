@@ -8,7 +8,7 @@ import Snake from './Snake/index';
 import './utils/initFirebase';
 
 const playersRef = firebase.database()
-  .ref('game/players')
+  .ref('game/snakes')
   .orderByChild('state')
   .equalTo(GameState.running);
 

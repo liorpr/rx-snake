@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import firebase from 'firebase';
 import R from 'ramda';
 import { Observable } from 'rxjs';
-import Board from './Game';
+import Game from './Game';
 import withKeyDown from "../hoc/withKeyDown";
 import withSwipe from '../hoc/withSwipe';
 import Point from './utils/Point';
@@ -11,7 +11,7 @@ import GameState from './utils/GameState';
 import KeyCodes from './utils/KeyCodes';
 import '../utils/initFirebase';
 
-const playersRef = firebase.database().ref('game/players');
+const snakesRef = firebase.database().ref('game/snakes');
 const candyRef = firebase.database().ref('game/config/candy');
 
 function toDirection(keyCode) {
@@ -33,9 +33,8 @@ function toDirection(keyCode) {
   }
 }
 
-function initGame({ name, playerId, gameSize: { width, height } }) {
+function initSnake({ playerId, gameSize: { width, height } }) {
   return {
-    name,
     playerId,
     state: GameState.loaded,
     snake: R.map(
@@ -102,17 +101,17 @@ const game = mapPropsStream(props$ => {
     .startWith(1)
     .scan(pause => !pause, true);
 
-  const play$ = sharedProps$.first().map(initGame)
-    .mergeMap(initialGame => {
-      const playerRef = playersRef.push(initialGame);
-      const current = playerRef.key;
+  const play$ = sharedProps$.first().map(initSnake)
+    .mergeMap(initialSnake => {
+      const snakeRef = snakesRef.push(initialSnake);
+      const current = snakeRef.key;
 
       return direction$
         .withLatestFrom(sharedProps$, pause$, Array.of)
-        .scan(play, initialGame)
+        .scan(play, initialSnake)
         .distinctUntilChanged(R.equals)
         .do(({ snake, score, state, direction }) =>
-          playerRef.update({
+          snakeRef.update({
             snake: snake.map(R.pick(['x', 'y', 'belly'])),
             score,
             state,
@@ -121,7 +120,7 @@ const game = mapPropsStream(props$ => {
           })
         )
         .map(R.assoc('current', current))
-        .finally(() => playerRef.child('state').set(GameState.ended));
+        .finally(() => snakeRef.child('state').set(GameState.ended));
     });
 
   const game$ = keyDown$
@@ -144,4 +143,4 @@ export default compose(
   game,
   withKeyDown,
   withSwipe,
-)(Board)
+)(Game)
