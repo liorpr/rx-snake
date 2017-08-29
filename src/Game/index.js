@@ -123,7 +123,8 @@ const game = mapPropsStream(props$ => {
         .finally(() => playerRef.child('state').set(GameState.ended));
     });
 
-  const game$ = keyDown$.filter(key => key === KeyCodes.enter)
+  const game$ = keyDown$
+    .filter(key => key === KeyCodes.enter || key === KeyCodes.numpadEnter)
     .startWith(1)
     .switchMapTo(play$);
 
