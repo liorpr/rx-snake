@@ -12,7 +12,7 @@ import { COLORS } from "../resources/colors";
 const Message = glamorous.div({
   top: '50%',
   position: 'relative',
-  fontSize: '3em',
+  fontSize: '6vh',
 });
 
 const Score = glamorous.div({

@@ -4,12 +4,16 @@ import { connect } from 'react-redux';
 import R from 'ramda';
 import { SOLUTO_BLUE } from "./resources/colors";
 
-const Wrapper = glamorous.div({ display: 'flex', height: '100vh' });
+const Wrapper = glamorous.div({
+  display: 'flex',
+  height: '100vh',
+  background: 'black',
+});
 const Board = glamorous.div(({ width, height }) => ({
   width: width,
   height: height,
   background: 'white',
-  border: `4px solid ${SOLUTO_BLUE}`,
+  border: `0.5vh solid ${SOLUTO_BLUE}`,
   margin: 'auto',
   position: 'relative',
   overflow: 'hidden',

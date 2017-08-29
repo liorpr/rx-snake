@@ -2,7 +2,6 @@ import React from 'react'
 import glamorous from 'glamorous';
 import { SOLUTO_BLUE } from "../resources/colors";
 
-const Svg = glamorous.svg({ enableBackground: 'new 0 0 91 91' });
 const Path = glamorous.path(({ color = SOLUTO_BLUE }) => ({ fill: color }));
 const Circle = glamorous.circle(({ color = SOLUTO_BLUE }) => ({
   fill: color,
@@ -10,7 +9,7 @@ const Circle = glamorous.circle(({ color = SOLUTO_BLUE }) => ({
 }));
 
 const BellySvg = ({ style, color }) => (
-  <Svg x="0px" y="0px" viewBox="0 0 91 91" style={style}>
+  <svg x="0px" y="0px" viewBox="0 0 91 91" style={style}>
     <g>
       <g>
         <Path color="#FFFFFF" d="M38.7,87.1c-19.2,0-34.8-15.6-34.8-34.8V38.7c0-19.2,15.6-34.8,34.8-34.8h13.6c19.2,0,34.8,15.6,34.8,34.8
@@ -21,7 +20,7 @@ const BellySvg = ({ style, color }) => (
       </g>
       <Circle color={color} cx="45.5" cy="45.5" r="33.7"/>
     </g>
-  </Svg>
+  </svg>
 );
 
 export default BellySvg;

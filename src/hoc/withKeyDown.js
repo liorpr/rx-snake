@@ -10,6 +10,6 @@ export default lifecycle({
       .subscribe(x => this.props.onKeyDown(x))
   },
   componentWillUnmount() {
-    this.disposable.dispose();
+    this.disposable.unsubscribe();
   }
 });

@@ -16,7 +16,6 @@ const TransparentPath = glamorous.path(({ color = SOLUTO_BLUE }) => ({
 }));
 const Svg = glamorous.svg(({ direction: [x, y]}) => ({
   transform: `rotate(${x === -1 ? 180 : y * 90}deg)`,
-  enableBackground: 'new 0 0 89 77',
 }));
 
 const HeadSvg = ({ style, direction, color }) => (
