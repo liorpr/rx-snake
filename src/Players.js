@@ -5,7 +5,7 @@ import R from 'ramda';
 import { Observable } from 'rxjs';
 import GameState from "./Game/utils/GameState";
 import Snake from './Snake/index';
-import './Game/utils/initFirebase';
+import './utils/initFirebase';
 
 const playersRef = firebase.database()
   .ref('game/players')

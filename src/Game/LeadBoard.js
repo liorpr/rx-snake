@@ -3,7 +3,7 @@ import {componentFromStream} from 'recompose';
 import Rx from 'rxjs';
 import R from 'ramda';
 import firebase from 'firebase';
-import './utils/initFirebase';
+import '../utils/initFirebase';
 
 const playersQuery = firebase.database().ref('game/players')
   .orderByChild('score')

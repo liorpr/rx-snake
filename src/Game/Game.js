@@ -24,12 +24,12 @@ const Score = glamorous.div({
   fontSize: '3em',
 });
 
-const Game = ({ snake, candy, state, width, height, score, current, direction, size }) => (
-  <Board {...{ width, height, size }}>
+const Game = ({ snake, state, score, current, direction, size }) => (
+  <Board>
     <Score>{score}</Score>
     <Players current={current} size={size} colors={COLORS}/>
     <Snake shape={snake} size={size} direction={direction}/>
-    <Candy point={candy} size={size}/>
+    <Candy />
     {state === GameState.loaded ? <Message>Swipe or Press any arrow to move</Message> : null}
     {state === GameState.ended ? <Message>GAME ENDED</Message> : null}
   </Board>
@@ -37,9 +37,6 @@ const Game = ({ snake, candy, state, width, height, score, current, direction, s
 
 Game.propTypes = {
   snake: PropTypes.arrayOf(pointShape).isRequired,
-  candy: pointShape.isRequired,
-  width: PropTypes.number.isRequired,
-  height: PropTypes.number.isRequired,
 };
 
 export default Game;

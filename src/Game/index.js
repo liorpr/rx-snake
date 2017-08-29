@@ -1,17 +1,15 @@
-import { createEventHandler, mapPropsStream, flattenProp, compose } from 'recompose';
+import { createEventHandler, mapPropsStream, compose } from 'recompose';
+import { connect } from 'react-redux';
 import firebase from 'firebase';
 import R from 'ramda';
 import { Observable } from 'rxjs';
 import Board from './Game';
 import withKeyDown from "../hoc/withKeyDown";
 import withSwipe from '../hoc/withSwipe';
-import withFirebase from '../hoc/withFirebase';
-import withWindowSize from '../hoc/withWindowSize';
-import getPointSize from '../utils/getPointSize';
 import Point from './utils/Point';
 import GameState from './utils/GameState';
 import KeyCodes from './utils/KeyCodes';
-import './utils/initFirebase';
+import '../utils/initFirebase';
 
 const playersRef = firebase.database().ref('game/players');
 const candyRef = firebase.database().ref('game/config/candy');
@@ -87,10 +85,7 @@ const game = mapPropsStream(props$ => {
   const candy$ = sharedProps$.pluck('candy')
     .distinctUntilChanged(R.equals);
 
-  const gameSize$ = sharedProps$.pluck('size')
-    .distinctUntilChanged(R.equals);
-
-  const windowSize$ = sharedProps$.pluck('windowSize')
+  const gameSize$ = sharedProps$.pluck('gameSize')
     .distinctUntilChanged(R.equals);
 
   const direction$ = keyDown$.map(toDirection)
@@ -137,11 +132,10 @@ const game = mapPropsStream(props$ => {
     .startWith(1)
     .switchMapTo(play$);
 
-  return Observable.combineLatest(game$, gameSize$, windowSize$)
-    .map(([game, gameSize, windowSize]) => ({
+  return Observable.combineLatest(sharedProps$, game$)
+    .map(([props, game]) => ({
+      ...props,
       ...game,
-      ...gameSize,
-      size: getPointSize(gameSize, windowSize),
       onKeyDown,
       onSwipe: onKeyDown,
       capture: Object.values(KeyCodes),
@@ -149,9 +143,7 @@ const game = mapPropsStream(props$ => {
 });
 
 export default compose(
-  withFirebase('game/config', 'config'),
-  flattenProp('config'),
-  withWindowSize,
+  connect(state => state),
   game,
   withKeyDown,
   withSwipe,
