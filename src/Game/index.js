@@ -33,9 +33,10 @@ function toDirection(keyCode) {
   }
 }
 
-function initGame({ name, gameSize: { width, height } }) {
+function initGame({ name, playerId, gameSize: { width, height } }) {
   return {
     name,
+    playerId,
     state: GameState.loaded,
     snake: R.map(
       () => new Point(~~(width / 2), ~~(height / 2)),

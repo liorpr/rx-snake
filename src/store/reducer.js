@@ -1,4 +1,5 @@
 import { handleActions } from 'redux-actions';
+import uuid from 'uuid/v4';
 import getPointSize from '../utils/getPointSize';
 
 const SET_GAME_SIZE = 'SET_GAME_SIZE';
@@ -15,12 +16,20 @@ const getWindowSize = () => ({
 export function getInitialState() {
   const gameSize = { width: 64, height: 36 };
   const windowSize = getWindowSize();
+
+  let playerId = localStorage.getItem('playerId');
+  if (!playerId) {
+    playerId = uuid();
+    localStorage.setItem('playerId', playerId);
+  }
+
   return {
     gameSize,
     windowSize,
     candy: { x: -1, y: -1 },
     ...getSize(gameSize, windowSize),
-    name: localStorage.getItem('name'),
+    name: localStorage.getItem('name') || '',
+    playerId,
   }
 }
 
