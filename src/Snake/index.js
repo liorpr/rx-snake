@@ -6,7 +6,7 @@ import SnakePart from './SnakePart';
 const Snake = ({ shape, ...props }) => (
   <div>
     {
-      shape.map((point, index) => <SnakePart key={point.uuid} {...props} point={point} index={index} />)
+      shape.map((point, index) => <SnakePart key={point.uuid} {...props} point={point} index={index}/>)
     }
   </div>
 );

@@ -4,7 +4,7 @@ import Head from './Head';
 import Body from './Body';
 import Belly from './Belly';
 
-const SnakePart = ({ index, ...props, point: {belly} }) => {
+const SnakePart = ({ index, ...props, point: { belly } }) => {
   let Part;
   if (index === 0) {
     Part = Head

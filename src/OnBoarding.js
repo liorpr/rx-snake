@@ -20,7 +20,7 @@ const Container = glamorous.div({
 });
 
 const Input = glamorous.input({
-  fontSize: '6vmin',
+  fontSize: '4vmin',
   color: SOLUTO_BLUE,
   borderStyle: 'solid',
   borderColor: 'rgba(102, 102, 102, 0.4)',
@@ -54,7 +54,7 @@ const Img = glamorous.img({
 
 const OnBoarding = ({ name, playerId, setName, push }) => (
   <Container>
-    <Logo />
+    <Logo/>
     <Img src={intro}/>
     <Input placeholder="Your good name here" value={name} onChange={e => setName(e.target.value)}/>
     <Button onClick={() => {

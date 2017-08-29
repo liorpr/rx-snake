@@ -19,7 +19,7 @@ const App = () => (
       <Switch>
         <Route exact path="/home" component={Home}/>
         <Route exact path="/play" render={() => (
-          localStorage.getItem('playerId') ? <Game /> : <Redirect to="/" />
+          localStorage.getItem('playerId') ? <Game/> : <Redirect to="/"/>
         )}/>
         <Route component={OnBoarding}/>
       </Switch>

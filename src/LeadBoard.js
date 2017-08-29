@@ -13,18 +13,18 @@ const Wrapper = glamorous.ul({
   width: 'max-content',
   listStyleType: 'none',
 });
-    
+
 const Score = glamorous.li({
   listStyleType: 'none',
   ':not(:first-of-type):before': {
     content: '"|"',
-    margin: '0 1.5em',
+    margin: '0 0.3em',
   }
 });
 
 const renderScores = R.pipe(
   R.toPairs,
-  R.sort(R.descend(([_, { score}]) => score)),
+  R.sort(R.descend(([_, { score }]) => score)),
   R.map(([playerId, { name, score }]) => <Score key={playerId}>{name} {score}</Score>)
 );
 

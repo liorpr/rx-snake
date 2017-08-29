@@ -23,6 +23,8 @@ const Message = glamorous.div({
   position: 'relative',
 });
 
+Message.displayName = 'Message';
+
 const Score = glamorous.div({
   opacity: 0.2,
   position: 'absolute',
@@ -30,7 +32,10 @@ const Score = glamorous.div({
   right: 0,
   margin: '0.1em 0.4em',
   fontSize: '12vmin',
+  fontWeight: 'bold',
 });
+
+Score.displayName = 'Score';
 
 const Game = ({ snake, state, score, current, direction, size }) => (
   <Wrapper>

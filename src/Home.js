@@ -18,7 +18,7 @@ const MainWrapper = glamorous.div({
   overflow: 'hidden',
   padding: '1em 0',
   boxSizing: 'border-box',
-})
+});
 
 const GameWrapper = glamorous.div({
   width: '100%',
@@ -26,21 +26,22 @@ const GameWrapper = glamorous.div({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  padding: '0 1.5em',
-})
+  padding: '0 0.5em',
+});
 
 const Img = glamorous.img({
   width: '40vmin',
+  marginLeft: '0.5em',
 });
 
 const Home = ({ size, candy }) => (
   <MainWrapper>
     <GameWrapper>
-      <Board style={{zoom:0.8}}>
+      <Board style={{ zoom: 0.8 }}>
         <Players size={size} colors={colors}/>
         <Candy/>
       </Board>
-      <Img src={qrCode} />
+      <Img src={qrCode}/>
     </GameWrapper>
     <LeadBoard/>
   </MainWrapper>

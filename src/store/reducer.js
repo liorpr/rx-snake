@@ -13,7 +13,7 @@ const getWindowSize = () => ({
 });
 
 export function getInitialState() {
-  const gameSize = { width: 64, height: 36 };
+  const gameSize = { width: 48, height: 27 };
   const windowSize = getWindowSize();
 
   return {
@@ -31,6 +31,7 @@ const set = type => payload => ({ type, payload });
 export const setWindowSize = () => ({ type: SET_WINDOW_SIZE, payload: getWindowSize() });
 export const setGameSize = set(SET_GAME_SIZE);
 export const setCandy = set(SET_CANDY);
+
 export function setName(name) {
   return function (dispatch) {
     localStorage.setItem('name', name);
@@ -39,7 +40,7 @@ export function setName(name) {
       playerId = uuid();
       localStorage.setItem('playerId', playerId);
     }
-    dispatch({ type: SET_NAME, payload: { name, playerId }});
+    dispatch({ type: SET_NAME, payload: { name, playerId } });
   }
 }
 

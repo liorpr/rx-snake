@@ -17,7 +17,8 @@ const Players = ({ players, colors, ...props }) => (
   <div>
     {
       Object.entries(players).map(([key, { snake, direction }], index) => (
-        <Snake key={key} color={colors[index % colors.length]} shape={snake.map(Point.from)} direction={direction} {...props} />
+        <Snake key={key} color={colors[index % colors.length]} shape={snake.map(Point.from)}
+               direction={direction} {...props} />
       ))
     }
   </div>

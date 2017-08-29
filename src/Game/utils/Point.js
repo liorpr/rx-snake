@@ -2,7 +2,7 @@ import uuid from 'uuid/v4';
 
 function wrap(num, to) {
   num = num % to;
-  if (num < 0) num+=to;
+  if (num < 0) num += to;
   return num;
 }
 
@@ -18,7 +18,7 @@ export default class Point {
     return new Point(~~(Math.random() * width), ~~(Math.random() * height));
   }
 
-  static from({x,y, size}) {
+  static from({ x, y, size }) {
     return new Point(x, y, size);
   }
 
