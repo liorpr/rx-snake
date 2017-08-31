@@ -1,14 +1,24 @@
+import React from 'react';
 import glamorous from 'glamorous';
 import { connect } from 'react-redux';
 import R from 'ramda';
+import Logo from './Logo';
 
-const Board = glamorous.div(({ width, height }) => ({
+const Wrapper = glamorous.div(({ width, height }) => ({
   width: width,
   height: height,
   background: 'white',
-  margin: 'auto',
   position: 'relative',
   overflow: 'hidden',
 }));
 
-export default connect(R.pickAll(['width', 'height']))(Board);
+const Board = connect(R.pickAll(['width', 'height']))(({ children, ...props }) => (
+  <Wrapper {...props}>
+    <Logo />
+    {children}
+  </Wrapper>
+))
+
+Board.displayName = 'Board';
+
+export default Board;

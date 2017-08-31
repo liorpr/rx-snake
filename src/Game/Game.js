@@ -11,6 +11,9 @@ import { SOLUTO_BLUE, COLORS } from "../resources/colors";
 
 const Wrapper = glamorous.div({
   display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
   height: '100vh',
   background: SOLUTO_BLUE,
 });
