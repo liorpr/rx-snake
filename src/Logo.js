@@ -5,7 +5,6 @@ import { SOLUTO_BLUE } from './resources/colors';
 const Svg = glamorous.svg({
   fill: SOLUTO_BLUE,
   width: '10vmin',
-  opacity: 0.2,
   position: 'absolute',
   top: '1em',
   right: '1em',

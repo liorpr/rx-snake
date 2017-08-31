@@ -14,7 +14,7 @@ const Wrapper = glamorous.div(({ width, height }) => ({
 
 const Board = connect(R.pickAll(['width', 'height']))(({ children, ...props }) => (
   <Wrapper {...props}>
-    <Logo />
+    <Logo style={{opacity: 0.2}}/>
     {children}
   </Wrapper>
 ))
