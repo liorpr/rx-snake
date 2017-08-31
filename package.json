@@ -29,6 +29,10 @@
     "eject": "react-scripts eject",
     "deploy:hosting": "yarn deploy -- --only hosting",
     "deploy:functions": "firebase deploy --only functions",
-    "deploy": "yarn build && firebase deploy"
+    "deploy": "yarn build && firebase deploy",
+    "firebase:login": "firebase login"
+  },
+  "devDependencies": {
+    "firebase-tools": "^3.9.2"
   }
 }
