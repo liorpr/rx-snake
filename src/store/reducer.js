@@ -21,7 +21,7 @@ export function getInitialState() {
     windowSize,
     candy: { x: -1, y: -1 },
     ...getSize(gameSize, windowSize),
-    name: localStorage.getItem('name'),
+    name: localStorage.getItem('name') || '',
     playerId: localStorage.getItem('playerId'),
   }
 }

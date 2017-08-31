@@ -21,7 +21,6 @@ const Wrapper = glamorous.div({
 const Message = glamorous.div({
   top: '50%',
   position: 'relative',
-  fontSize: '6vmin',
 });
 
 const Score = glamorous.div({

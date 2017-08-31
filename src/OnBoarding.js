@@ -14,7 +14,6 @@ const Container = glamorous.div({
   justifyContent: 'space-between',
   alignItems: 'center',
   boxSizing: 'border-box',
-  fontSize: '6vmin',
   fontWeight: 'bold',
 });
 

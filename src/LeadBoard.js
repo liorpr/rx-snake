@@ -3,21 +3,29 @@ import { createEventHandler, mapPropsStream } from 'recompose';
 import R from 'ramda';
 import firebase from 'firebase';
 import glamorous from 'glamorous';
-import { SOLUTO_BLUE } from "./resources/colors";
 
-const Wrapper = glamorous.div({
-  background: SOLUTO_BLUE,
+const Wrapper = glamorous.ul({
   color: 'white',
+  display: 'flex',
+  alignItems: 'center',
+  margin: 0,
+  padding: 0,
+  width: 'max-content',
+  listStyleType: 'none',
 });
-
-const Score = ({ name, score }) => (
-  <div>{name}: {score}</div>
-);
+    
+const Score = glamorous.li({
+  listStyleType: 'none',
+  ':not(:first-of-type):before': {
+    content: '"|"',
+    margin: '0 1.5em',
+  }
+});
 
 const renderScores = R.pipe(
   R.toPairs,
   R.sort(R.descend(([_, { score}]) => score)),
-  R.map(([playerId, playerData]) => <Score key={playerId} {...playerData}/>)
+  R.map(([playerId, { name, score }]) => <Score key={playerId}>{name} {score}</Score>)
 );
 
 const LeadBoard = ({ scores }) => (
@@ -33,7 +41,7 @@ export default mapPropsStream(() => {
 
   const scoresQuery = firebase.database().ref('game/players')
     .orderByChild('score')
-    .limitToLast(10);
+    .limitToLast(5);
 
   scoresQuery.on('value', onTopScores);
 
