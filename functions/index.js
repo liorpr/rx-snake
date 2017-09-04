@@ -21,3 +21,14 @@ exports.topScores = functions.database.ref('game/snakes/{snakeId}/score')
           });
       });
   });
+
+exports.candyValidation = functions.database.ref('game/config')
+  .onUpdate(event => {
+    const { candy, size } = event.data.val();
+    if (candy.x > size.width || candy.x < 0 || candy.y > size.height || candy.y < 0) {
+      return event.data.ref.child('candy').set({
+        x: Math.abs(candy.x % size.width),
+        y: Math.abs(candy.y % size.height),
+      });
+    }
+  });
