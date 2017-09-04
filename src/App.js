@@ -18,9 +18,11 @@ const App = () => (
     <ConnectedRouter history={browserHistory}>
       <Switch>
         <Route exact path="/home" component={Home}/>
-        <Route exact path="/play" render={() => (
-          localStorage.getItem('playerId') ? <Game/> : <Redirect to="/"/>
-        )}/>
+        <Route exact path="/play" render={() => {
+          const playerId = localStorage.getItem('playerId');
+          const name = localStorage.getItem('name');
+          return playerId && name && name !== ''  ? <Game/> : <Redirect to="/"/>;
+        }}/>
         <Route component={OnBoarding}/>
       </Switch>
     </ConnectedRouter>

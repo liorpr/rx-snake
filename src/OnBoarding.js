@@ -1,6 +1,6 @@
 import React from 'react';
 import firebase from 'firebase';
-import glamorous from 'glamorous';
+import glamorous, { Div } from 'glamorous';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { setName } from "./store/reducer";
@@ -44,6 +44,11 @@ const Button = glamorous.button({
   border: 'none',
   cursor: 'pointer',
   ':focus': { outline: 0 },
+  ':disabled': {
+    background: '#666666',
+    opacity: 0.4,
+    cursor: 'default',
+  },
 });
 
 const Img = glamorous.img({
@@ -56,8 +61,11 @@ const OnBoarding = ({ name, playerId, setName, push }) => (
   <Container>
     <Logo/>
     <Img src={intro}/>
-    <Input placeholder="Your good name here" value={name} onChange={e => setName(e.target.value)}/>
-    <Button onClick={() => {
+    <div>
+      <Input placeholder="Your good name here" value={name} onChange={e => setName(e.target.value)}/>
+      <Div fontSize="0.3em" visibility={name.length > 12 ? null : 'hidden'}>* Name must be max 12 characters</Div>
+    </div>
+    <Button disabled={name === '' || name.length > 12} onClick={() => {
       firebase.database().ref('game/players')
         .child(playerId)
         .child('name')
