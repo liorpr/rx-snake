@@ -1,13 +1,10 @@
 {
   "short_name": "Snake",
   "name": "React Rx Snake",
-  "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "192x192",
-      "type": "image/png"
-    }
-  ],
+  "icons": {
+    "192": "favicon.ico",
+    "144": "android-icon-144x144.png"
+  },
   "start_url": "./index.html",
   "display": "standalone",
   "theme_color": "#00aeef",
