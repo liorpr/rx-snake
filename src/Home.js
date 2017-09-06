@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import glamorous from 'glamorous';
-import colors, { SOLUTO_BLUE } from './resources/colors';
+import colors from './resources/colors';
 import Board from './Board';
 import Candy from './Candy';
 import Players from './Players';
@@ -9,14 +9,13 @@ import LeadBoard from './LeadBoard';
 import qrCode from './resources/qr-code.png'
 
 const MainWrapper = glamorous.div({
-  background: SOLUTO_BLUE,
+  background: '#666',
   height: '100vh',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
   alignItems: 'center',
   overflow: 'hidden',
-  padding: '1em 0',
   boxSizing: 'border-box',
 });
 
@@ -25,23 +24,48 @@ const GameWrapper = glamorous.div({
   boxSizing: 'border-box',
   display: 'flex',
   justifyContent: 'space-between',
-  alignItems: 'center',
-  padding: '0 0.5em',
+  alignItems: 'flex-end',
+  padding: '0 2vmin',
+});
+
+const SideBar = glamorous.div({
+  color: 'white',
+  display: 'flex',
+  flexDirection: 'column',
+  padding: '4vmin 0 0 0',
+  marginLeft: '2vmin',
+});
+
+const MeetupInfo = glamorous.div({
+  fontSize: '4vmin',
+  display: 'flex',
+  flexDirection: 'column',
+  marginTop: '6vmin',
 });
 
 const Img = glamorous.img({
-  width: '40vmin',
-  marginLeft: '0.5em',
+  width: '35vmin',
+  margin: '2vmin 0',
 });
 
 const Home = ({ size, candy }) => (
   <MainWrapper>
     <GameWrapper>
-      <Board style={{ zoom: 0.8 }}>
+      <Board style={{ zoom: 0.76 }}>
         <Players size={size} colors={colors}/>
         <Candy/>
       </Board>
-      <Img src={qrCode}/>
+      <SideBar>
+        <span><strong>Soluto</strong> Snake</span>
+        <Img src={qrCode}/>
+        <span>Scan to play!</span>
+        <MeetupInfo>
+          <span>Join our Rx meetup</span>
+          <span><strong>@2/10/2017</strong></span>
+          <span>and see how this</span>
+          <span>game was made</span>
+        </MeetupInfo>
+      </SideBar>
     </GameWrapper>
     <LeadBoard/>
   </MainWrapper>

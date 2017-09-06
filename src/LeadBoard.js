@@ -3,15 +3,18 @@ import { createEventHandler, mapPropsStream } from 'recompose';
 import R from 'ramda';
 import firebase from 'firebase';
 import glamorous from 'glamorous';
+import { SOLUTO_BLUE } from "./resources/colors";
 
 const Wrapper = glamorous.ul({
+  background: SOLUTO_BLUE,
   color: 'white',
   display: 'flex',
   alignItems: 'center',
+  justifyContent: 'center',
   margin: 0,
-  padding: 0,
-  width: 'max-content',
+  padding: '0.2em 0',
   listStyleType: 'none',
+  width: '100%',
 });
 
 const Score = glamorous.li({
