@@ -34,7 +34,7 @@ export const setCandy = set(SET_CANDY);
 
 export function setName(name) {
   return function (dispatch) {
-    localStorage.setItem('name', name);
+    localStorage.setItem('name', name.trim());
     let playerId = localStorage.getItem('playerId');
     if (!playerId) {
       playerId = uuid();

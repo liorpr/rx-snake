@@ -25,6 +25,7 @@ const Input = glamorous.input({
   borderStyle: 'solid',
   borderColor: 'rgba(102, 102, 102, 0.4)',
   borderWidth: '0 0 0.08em 0',
+  borderRadius: 0,
   textAlign: 'center',
   ':focus': { outline: 0 },
   '::-webkit-input-placeholder': {
@@ -65,11 +66,11 @@ const OnBoarding = ({ name, playerId, setName, push }) => (
       <Input placeholder="Your good name here" value={name} onChange={e => setName(e.target.value)}/>
       <Div fontSize="0.3em" visibility={name.length > 12 ? null : 'hidden'}>* Name must be max 12 characters</Div>
     </div>
-    <Button disabled={name === '' || name.length > 12} onClick={() => {
+    <Button disabled={name === '' || name.trim().length > 12} onClick={() => {
       firebase.database().ref('game/players')
         .child(playerId)
         .child('name')
-        .set(name);
+        .set(name.trim());
 
       push('/play');
     }}>Game on!</Button>

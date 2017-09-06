@@ -7,19 +7,19 @@ function wrap(num, to) {
 }
 
 export default class Point {
-  constructor(x, y, belly = false) {
+  constructor(x, y, belly = false, uid = uuid()) {
     this.x = x;
     this.y = y;
     this.belly = belly;
-    this.uuid = uuid();
+    this.uuid = uid;
   }
 
   static random(width, height) {
     return new Point(~~(Math.random() * width), ~~(Math.random() * height));
   }
 
-  static from({ x, y, size }) {
-    return new Point(x, y, size);
+  static from({ x, y, belly, uuid }) {
+    return new Point(x, y, belly, uuid);
   }
 
   move([x = 0, y = 0]) {

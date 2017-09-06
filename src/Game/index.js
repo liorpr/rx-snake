@@ -112,7 +112,7 @@ const game = mapPropsStream(props$ => {
         .distinctUntilChanged(R.equals)
         .do(({ snake, score, state, direction }) =>
           snakeRef.update({
-            snake: snake.map(R.pick(['x', 'y', 'belly'])),
+            snake,
             score,
             state,
             direction,
@@ -134,7 +134,7 @@ const game = mapPropsStream(props$ => {
       ...game,
       onKeyDown,
       onSwipe: onKeyDown,
-      capture: Object.values(KeyCodes),
+      capture: R.values(KeyCodes),
     }));
 });
 
