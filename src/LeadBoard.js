@@ -5,16 +5,33 @@ import firebase from 'firebase';
 import glamorous from 'glamorous';
 import { SOLUTO_BLUE } from "./resources/colors";
 
-const Wrapper = glamorous.ul({
+const Wrapper = glamorous.div({
   background: SOLUTO_BLUE,
   color: 'white',
+  padding: '0.2em 0',
+  width: '100%',
+});
+
+const Container = glamorous.div({
+  margin: 'auto',
+  display: 'flex',
+  position: 'relative',
+  width: 'fit-content',
+});
+
+const Title = glamorous.div({
+  position: 'absolute',
+  top: 'calc(0.8vmin - 100%)',
+  opacity: 0.6,
+  color: SOLUTO_BLUE,
+});
+
+const List = glamorous.ul({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center',
-  margin: 0,
-  padding: '0.2em 0',
   listStyleType: 'none',
-  width: '100%',
+  margin: 0,
+  padding: 0,
 });
 
 const Score = glamorous.li({
@@ -33,9 +50,14 @@ const renderScores = R.pipe(
 
 const LeadBoard = ({ scores }) => (
   <Wrapper>
-    {
-      renderScores(scores)
-    }
+    <Container>
+      <Title>Who's Hot?</Title>
+      <List>
+        {
+          renderScores(scores)
+        }
+      </List>
+    </Container>
   </Wrapper>
 );
 
