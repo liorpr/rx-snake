@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import Game from './Game';
 import withKeyDown from "../hoc/withKeyDown";
 import withSwipe from '../hoc/withSwipe';
+import withFocus from '../hoc/withFocus';
 import Point from './utils/Point';
 import GameState from './utils/GameState';
 import KeyCodes from './utils/KeyCodes';
@@ -80,6 +81,7 @@ function play({ snake, state, score }, [direction, { candy, gameSize: { width, h
 
 const game = mapPropsStream(props$ => {
   const { handler: onKeyDown, stream: keyDown$ } = createEventHandler();
+  const { handler: onFocus, stream: onFocus$ } = createEventHandler();
 
   const sharedProps$ = props$.publishReplay(1).refCount();
 
@@ -99,7 +101,8 @@ const game = mapPropsStream(props$ => {
 
   const pause$ = keyDown$.filter(key => key === KeyCodes.space)
     .startWith(1)
-    .scan(pause => !pause, true);
+    .scan(pause => !pause, true)
+    .merge(onFocus$.map(x => !x));
 
   const play$ = sharedProps$.first().map(initSnake)
     .mergeMap(initialSnake => {
@@ -134,6 +137,7 @@ const game = mapPropsStream(props$ => {
       ...game,
       onKeyDown,
       onSwipe: onKeyDown,
+      onFocus,
       capture: R.values(KeyCodes),
     }));
 });
@@ -143,6 +147,7 @@ export default compose(
   game,
   withKeyDown,
   withSwipe,
+  withFocus,
   lifecycle({
     componentDidMount() {
       window.scrollTo(0, document.body.scrollHeight);
