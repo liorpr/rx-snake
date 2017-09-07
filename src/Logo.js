@@ -7,7 +7,7 @@ const Svg = glamorous.svg({
   width: '8vmin',
   position: 'absolute',
   top: '0.8em',
-  right: '0.8em',
+  left: '0.8em',
 });
 
 const LogoSvg = props => (

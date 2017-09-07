@@ -29,7 +29,7 @@ const Score = glamorous.div({
   opacity: 0.2,
   position: 'absolute',
   bottom: 0,
-  right: 0,
+  left: 0,
   margin: '0.1em 0.4em',
   fontSize: '12vmin',
   fontWeight: 'bold',

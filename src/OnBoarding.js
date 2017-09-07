@@ -46,7 +46,7 @@ const Button = glamorous.button({
   cursor: 'pointer',
   ':focus': { outline: 0 },
   ':disabled': {
-    background: '#666666',
+    background: '#696969',
     opacity: 0.4,
     cursor: 'default',
   },
