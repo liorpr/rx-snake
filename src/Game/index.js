@@ -6,13 +6,13 @@ import { Observable } from 'rxjs';
 import Game from './Game';
 import withKeyDown from "../hoc/withKeyDown";
 import withSwipe from '../hoc/withSwipe';
-import withFocus from '../hoc/withFocus';
+import withEvent from '../hoc/withEvent';
 import Point from './utils/Point';
 import GameState from './utils/GameState';
 import KeyCodes from './utils/KeyCodes';
 import '../utils/initFirebase';
 
-const snakesRef = firebase.database().ref('game/snakes');
+const snakesRef = firebase.database().ref('game/snakes2');
 const candyRef = firebase.database().ref('game/config/candy');
 
 function toDirection(keyCode) {
@@ -46,8 +46,8 @@ function initSnake({ playerId, gameSize: { width, height } }) {
   }
 }
 
-function detectCollision(snake) {
-  return snake.slice(1).some(x => snake[0].equals(x));
+function detectCollision(nextPoint, snake) {
+  return snake.some(x => nextPoint.equals(x));
 }
 
 function play({ snake, state, score }, [direction, { candy, gameSize: { width, height } }, pause]) {
@@ -60,8 +60,14 @@ function play({ snake, state, score }, [direction, { candy, gameSize: { width, h
   }
 
   const nextPoint = snake[0].move(direction).wrap(width, height);
+
+  if (detectCollision(nextPoint, snake)) {
+    state = GameState.ended;
+  } else {
+    state = GameState.running;
+  }
+
   snake = R.prepend(nextPoint, snake);
-  state = GameState.running;
 
   if (nextPoint.equals(candy)) {
     snake = R.adjust(p => p.inflate(), 0, snake);
@@ -72,16 +78,12 @@ function play({ snake, state, score }, [direction, { candy, gameSize: { width, h
     snake = R.dropLast(1, snake);
   }
 
-  if (detectCollision(snake)) {
-    state = GameState.ended;
-  }
-
   return result();
 }
 
 const game = mapPropsStream(props$ => {
   const { handler: onKeyDown, stream: keyDown$ } = createEventHandler();
-  const { handler: onFocus, stream: onFocus$ } = createEventHandler();
+  const { handler: onBlur, stream: onBlur$ } = createEventHandler();
 
   const sharedProps$ = props$.publishReplay(1).refCount();
 
@@ -92,36 +94,39 @@ const game = mapPropsStream(props$ => {
       if ((prev[0] === next[0] || prev[1] === next[1])) return prev;
       return next;
     })
-    .bufferTime(100)
+    .bufferTime(80)
     .map(R.dropRepeats)
     .mergeScan((prev, next) => {
       if (next.length === 0) return Observable.of(prev);
       return Observable.of(...next);
     });
 
-  const pause$ = keyDown$.filter(key => key === KeyCodes.space)
-    .startWith(1)
-    .scan(pause => !pause, true)
-    .merge(onFocus$.map(x => !x));
+  const pause$ = keyDown$.filter(key => key === KeyCodes.space).map(_ => 'space')
+    .merge(onBlur$.map(_ => 'blur'))
+    .startWith('space')
+    .scan((prev, next) => next === 'blur' ? true : !prev , true);
 
   const play$ = sharedProps$.first().map(initSnake)
     .mergeMap(initialSnake => {
-      const snakeRef = snakesRef.push(initialSnake);
+      const snakeRef = snakesRef.push();
       const current = snakeRef.key;
+
+      snakeRef.onDisconnect().update({ state: GameState.ended });
 
       return direction$
         .withLatestFrom(sharedProps$, pause$, Array.of)
         .scan(play, initialSnake)
         .distinctUntilChanged(R.equals)
-        .do(({ snake, score, state, direction }) =>
+        .do(({ snake, score, state, direction }) => {
+          if (state === GameState.loaded) return;
           snakeRef.update({
-            snake,
+            snake: JSON.stringify(snake),
             score,
             state,
             direction,
-            updated: ~~((new Date()).getTime() / 1000)
+            updated: ~~((new Date()).getTime() / 1000),
           })
-        )
+        })
         .map(R.assoc('current', current))
         .finally(() => snakeRef.child('state').set(GameState.ended));
     });
@@ -137,7 +142,7 @@ const game = mapPropsStream(props$ => {
       ...game,
       onKeyDown,
       onSwipe: onKeyDown,
-      onFocus,
+      onBlur,
       capture: R.values(KeyCodes),
     }));
 });
@@ -147,7 +152,7 @@ export default compose(
   game,
   withKeyDown,
   withSwipe,
-  withFocus,
+  withEvent('blur', 'onBlur'),
   lifecycle({
     componentDidMount() {
       window.scrollTo(0, document.body.scrollHeight);

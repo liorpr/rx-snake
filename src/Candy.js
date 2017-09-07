@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { renameProp, compose } from 'recompose';
+import { compose } from 'recompose';
 import pointShape from './Game/utils/pointShape';
 import withLocation from './hoc/withLocation';
 import candy from './resources/candy.png';
@@ -14,7 +14,6 @@ Candy.propTypes = {
 };
 
 export default compose(
-  connect(state => state),
-  renameProp('candy', 'point'),
+  connect(({candy, size}) => ({point: candy, size})),
   withLocation,
 )(Candy);

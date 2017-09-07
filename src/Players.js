@@ -8,7 +8,7 @@ import Snake from './Snake/index';
 import './utils/initFirebase';
 
 const playersRef = firebase.database()
-  .ref('game/snakes')
+  .ref('game/snakes2')
   .orderByChild('state')
   .equalTo(GameState.running);
 
@@ -43,7 +43,10 @@ export default compose(
       .map(x => x.exists() ? x.val() : {})
       .withLatestFrom(sharedProps$.pluck('current'), (players, current) => {
         const now = ~~((new Date()).getTime() / 1000);
-        return R.pickBy((player, key) => key !== current && now - player.updated < 15, players)
+        return R.pipe(
+          R.pickBy((player, key) => key !== current && now - player.updated < 15),
+          R.map(({ snake, ...rest }) => ({ ...rest, snake: JSON.parse(snake) })),
+        )(players);
       })
       .startWith({});
 
