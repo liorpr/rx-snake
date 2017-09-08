@@ -37,15 +37,24 @@ const Score = glamorous.div({
 
 Score.displayName = 'Score';
 
-const Game = ({ snake, state, score, current, direction, size }) => (
+const SwipeMessage = glamorous.div({
+  opacity: 0.2,
+  position: 'absolute',
+  width: '100%',
+  padding: '0.5em 0',
+  bottom: 0,
+});
+
+const Game = ({ snake, state, score, current, direction, size, isFullScreen }) => (
   <Wrapper>
     <Board>
+      {document.webkitFullscreenEnabled && !isFullScreen ? <SwipeMessage>Double tap to enter full screen mode</SwipeMessage> : null}
       <Score>{score}</Score>
       <Players current={current} size={size} colors={COLORS}/>
       <Snake shape={snake} size={size} direction={direction}/>
       <Candy/>
-      {state === GameState.loaded ? <Message>Swipe or Press any arrow to move</Message> : null}
-      {state === GameState.ended ? <Message>GAME ENDED</Message> : null}
+      {state === GameState.loaded ? <Message>Swipe or press any arrow to move</Message> : null}
+      {state === GameState.ended ? <Message>GAME ENDED<br/>Double tap or press Enter to start again</Message> : null}
       {state === GameState.paused ? <Message>PAUSED</Message> : null}
     </Board>
   </Wrapper>

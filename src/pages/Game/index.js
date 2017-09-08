@@ -1,4 +1,4 @@
-import { createEventHandler, mapPropsStream, lifecycle, compose } from 'recompose';
+import { createEventHandler, mapPropsStream, compose } from 'recompose';
 import { connect } from 'react-redux';
 import firebase from 'firebase';
 import R from 'ramda';
@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import withKeyDown from '../../hoc/withKeyDown';
 import withSwipe from '../../hoc/withSwipe';
 import withEvent from '../../hoc/withEvent';
+import withFullScreen from '../../hoc/withFullScreen';
 import Point from '../../utils/Point';
 import GameState from '../../utils/GameState';
 import KeyCodes from '../../utils/KeyCodes';
@@ -50,42 +51,45 @@ function detectCollision(nextPoint, snake) {
   return snake.some(x => nextPoint.equals(x));
 }
 
-function play({ snake, state, score }, [direction, { candy, gameSize: { width, height } }, pause]) {
-  const result = () => ({ snake, state, score, candy, direction });
-  if (state === GameState.ended || direction.length !== 2) return result();
-
-  if (pause) {
-    state = GameState.paused;
-    return result();
-  }
-
-  let nextPoint = snake[0].move(direction).wrap(width, height);
-
-  if (nextPoint.equals(candy)) {
-    nextPoint = nextPoint.inflate();
-    candy = Point.random(width, height);
-    candyRef.set(R.pick(['x', 'y'], candy));
-    score++;
-  } else {
-    snake = R.dropLast(1, snake);
-  }
-
-  if (detectCollision(nextPoint, snake)) {
-    state = GameState.ended;
-  } else {
-    state = GameState.running;
-  }
-
-  snake = R.prepend(nextPoint, snake);
-
-  return result();
-}
-
 const game = mapPropsStream(props$ => {
   const { handler: onKeyDown, stream: keyDown$ } = createEventHandler();
   const { handler: onBlur, stream: onBlur$ } = createEventHandler();
 
   const sharedProps$ = props$.publishReplay(1).refCount();
+
+  function play({ snake, state, score }, [direction, { candy, gameSize: { width, height } }, pause]) {
+    const result = () => ({ snake, state, score, candy, direction });
+    if (state === GameState.ended || direction.length !== 2) {
+      if (pause) onKeyDown(KeyCodes.enter);
+      return result();
+    }
+
+    if (pause) {
+      state = GameState.paused;
+      return result();
+    }
+
+    let nextPoint = snake[0].move(direction).wrap(width, height);
+
+    if (nextPoint.equals(candy)) {
+      nextPoint = nextPoint.inflate();
+      candy = Point.random(width, height);
+      candyRef.set(R.pick(['x', 'y'], candy));
+      score++;
+    } else {
+      snake = R.dropLast(1, snake);
+    }
+
+    if (detectCollision(nextPoint, snake)) {
+      state = GameState.ended;
+    } else {
+      state = GameState.running;
+    }
+
+    snake = R.prepend(nextPoint, snake);
+
+    return result();
+  }
 
   const direction$ = keyDown$.map(toDirection)
     .filter(d => d.length === 2)
@@ -101,10 +105,17 @@ const game = mapPropsStream(props$ => {
       return Observable.of(...next);
     });
 
-  const pause$ = keyDown$.filter(key => key === KeyCodes.space).map(_ => 'space')
+  const pause$ = keyDown$.filter(key => key === KeyCodes.space)
     .merge(onBlur$.map(_ => 'blur'))
-    .startWith('space')
-    .scan((prev, next) => next === 'blur' ? true : !prev, true);
+    .startWith(false)
+    .scan((prev, next) => {
+      if (next === 'blur') return true;
+      if (next && document.webkitFullscreenEnabled && !document.webkitFullscreenElement) {
+        document.documentElement.webkitRequestFullscreen();
+        return prev;
+      }
+      return !prev;
+    }, true);
 
   const play$ = sharedProps$.first().map(initSnake)
     .mergeMap(initialSnake => {
@@ -153,9 +164,5 @@ export default compose(
   withKeyDown,
   withSwipe,
   withEvent('blur', 'onBlur'),
-  lifecycle({
-    componentDidMount() {
-      window.scrollTo(0, document.body.scrollHeight);
-    },
-  }),
+  withFullScreen,
 )(Game);

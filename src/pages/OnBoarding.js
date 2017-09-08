@@ -75,6 +75,10 @@ const OnBoarding = ({ name, playerId, setName, history }) => (
         .set(name.trim());
 
       history.push('/play');
+
+      if (document.webkitFullscreenEnabled) {
+        document.documentElement.webkitRequestFullscreen();
+      }
     }}>Game on!</Button>
   </Container>
 );
