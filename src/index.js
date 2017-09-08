@@ -2,8 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { setObservableConfig } from 'recompose';
 import { Observable } from 'rxjs';
-import './index.css';
 import App from './App';
+import './index.css';
+
+global.playerId = localStorage.getItem('playerId');
 
 setObservableConfig({
   fromESObservable: Observable.from,

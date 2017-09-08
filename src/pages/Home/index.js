@@ -5,8 +5,6 @@ import glamorous, { Span, Img } from 'glamorous';
 import colors, { SOLUTO_GRAY } from '../../resources/colors';
 import qrCode from '../../resources/qr-code.png';
 import Board from '../../components/Board';
-import Candy from '../../components/Candy';
-import Players from '../../components/Players';
 import LeadBoard from './LeadBoard';
 
 const Wrapper = glamorous.div({
@@ -34,7 +32,6 @@ const Grid = glamorous.div({
 
 const Header = glamorous.div({
   gridArea: 'header',
-  // paddingTop: '0.8em',
 });
 
 const GameArea = glamorous.div({
@@ -74,10 +71,7 @@ const Home = ({ size, candy }) => (
         <span>game was made</span>
       </MeetupInfo>
       <GameArea>
-        <Board style={{ zoom: 0.834 }}>
-          <Players size={size} colors={colors}/>
-          <Candy/>
-        </Board>
+        <Board style={{ zoom: 0.834 }} colors={colors}/>
         <LeadBoard/>
       </GameArea>
     </Grid>

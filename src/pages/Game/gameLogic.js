@@ -34,9 +34,8 @@ function toDirection(keyCode) {
   }
 }
 
-function initSnake({ playerId, gameSize: { width, height } }) {
+function initSnake({ gameSize: { width, height } }) {
   return {
-    playerId,
     state: GameState.loaded,
     snake: R.map(
       () => new Point(~~(width / 2), ~~(height / 2)),
@@ -56,8 +55,8 @@ const game = mapPropsStream(props$ => {
 
   const sharedProps$ = props$.publishReplay(1).refCount();
 
-  function play({ snake, state, score }, [direction, { candy, gameSize: { width, height }, playerId }, pause]) {
-    const result = () => ({ snake, state, score, candy, direction, playerId });
+  function play({ snake, state, score }, [direction, { candy, gameSize: { width, height } }, pause]) {
+    const result = () => ({ snake, state, score, candy, direction });
     if (state === GameState.ended || direction.length !== 2) {
       if (pause) onKeyDown(KeyCodes.enter);
       return result();
@@ -127,11 +126,11 @@ const game = mapPropsStream(props$ => {
         .withLatestFrom(sharedProps$, pause$, Array.of)
         .scan(play, initialSnake)
         .distinctUntilChanged(R.equals)
-        .do(({ snake, score, state, direction, playerId }) => {
+        .do(({ snake, score, state, direction }) => {
           if (state === GameState.loaded) return;
           snakeRef.update({
             snake: JSON.stringify(snake),
-            playerId,
+            playerId: global.playerId,
             score,
             state,
             direction,

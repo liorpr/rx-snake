@@ -1,11 +1,8 @@
 import React from 'react';
 import firebase from 'firebase';
-import R from 'ramda';
 import glamorous, { Div } from 'glamorous';
-import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { compose } from 'recompose';
-import { setName } from '../store/reducer';
+import { compose, mapProps, withState, lifecycle } from 'recompose';
 import { SOLUTO_BLUE, SOLUTO_GRAY } from '../resources/colors';
 import intro from '../resources/intro.gif';
 import Logo from '../components/Logo';
@@ -63,30 +60,51 @@ const Img = glamorous.img({
   marginBottom: '-3vmin',
 });
 
-const OnBoarding = ({ name, playerId, setName, history }) => (
+const OnBoarding = ({ name, setName, startGame }) => (
   <Container>
     <Logo/>
     <Img src={intro}/>
     <div>
       <Input placeholder="Your name goes here" value={name} onChange={e => setName(e.target.value)}/>
-      <Div fontSize="0.3em" visibility={name.length > maxNameLength ? null : 'hidden'}>* Name must be max {maxNameLength} characters</Div>
+      <Div fontSize="0.3em" visibility={name.length > maxNameLength ? null : 'hidden'}>
+        * Name must be max {maxNameLength} characters
+      </Div>
     </div>
-    <Button disabled={name === '' || name.trim().length > maxNameLength} onClick={() => {
-      firebase.database().ref('game/players')
-        .child(playerId)
-        .child('name')
-        .set(name.trim());
+    <Button disabled={name === '' || name.trim().length > maxNameLength} onClick={startGame}>
+      Game on!
+    </Button>
+  </Container>
+);
 
+export default compose(
+  withRouter,
+  withState('name', 'setName', ''),
+  lifecycle({
+    componentWillMount() {
+      this.props.setName(localStorage.getItem('name') || '');
+    },
+  }),
+  mapProps(({ history, ...props, name }) => ({
+    ...props,
+    startGame() {
+      name = name.trim();
+      const players = firebase.database().ref('game/players');
+
+      if (global.playerId) {
+        players.child(global.playerId)
+          .child('name')
+          .set(name);
+      } else {
+        global.playerId = players.push({ name }).key;
+        localStorage.setItem('playerId', global.playerId);
+      }
+
+      localStorage.setItem('name', name);
       history.push('/play');
 
       if (document.webkitFullscreenEnabled) {
         document.documentElement.webkitRequestFullscreen();
       }
-    }}>Game on!</Button>
-  </Container>
-);
-
-export default compose(
-  connect(R.pick(['name', 'playerId']), { setName }),
-  withRouter,
+    },
+  })),
 )(OnBoarding);

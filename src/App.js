@@ -16,10 +16,7 @@ const App = () => (
     <Router>
       <Switch>
         <Route exact path="/home" component={Home}/>
-        <Route exact path="/play" render={() => {
-          const name = localStorage.getItem('name');
-          return name && name !== ''  ? <Game/> : <Redirect to="/"/>;
-        }}/>
+        <Route exact path="/play" render={() => global.playerId ? <Game/> : <Redirect to="/"/>}/>
         <Route component={OnBoarding}/>
       </Switch>
     </Router>
