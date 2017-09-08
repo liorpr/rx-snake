@@ -10,6 +10,8 @@ import { SOLUTO_BLUE, SOLUTO_GRAY } from '../resources/colors';
 import intro from '../resources/intro.gif';
 import Logo from '../components/Logo';
 
+const maxNameLength = 15;
+
 const Container = glamorous.div({
   display: 'flex',
   flexDirection: 'column',
@@ -29,6 +31,7 @@ const Input = glamorous.input({
   borderWidth: '0 0 0.08em 0',
   borderRadius: 0,
   textAlign: 'center',
+  minWidth: '12em',
   ':focus': { outline: 0 },
   '::-webkit-input-placeholder': {
     fontStyle: 'italic',
@@ -65,10 +68,10 @@ const OnBoarding = ({ name, playerId, setName, history }) => (
     <Logo/>
     <Img src={intro}/>
     <div>
-      <Input placeholder="Your good name here" value={name} onChange={e => setName(e.target.value)}/>
-      <Div fontSize="0.3em" visibility={name.length > 12 ? null : 'hidden'}>* Name must be max 12 characters</Div>
+      <Input placeholder="Your name goes here" value={name} onChange={e => setName(e.target.value)}/>
+      <Div fontSize="0.3em" visibility={name.length > maxNameLength ? null : 'hidden'}>* Name must be max {maxNameLength} characters</Div>
     </div>
-    <Button disabled={name === '' || name.trim().length > 12} onClick={() => {
+    <Button disabled={name === '' || name.trim().length > maxNameLength} onClick={() => {
       firebase.database().ref('game/players')
         .child(playerId)
         .child('name')

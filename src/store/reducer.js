@@ -72,5 +72,5 @@ export default handleActions({
   [SET_WINDOW_SIZE]: handleWindowSize,
   [SET_GAME_SIZE]: handleGameSize,
   [SET_CANDY]: (state, { payload }) => ({ ...state, candy: payload }),
-  [SET_NAME]: (state, { payload }) => ({ ...state, ...payload }),
+  [SET_NAME]: (state, { payload }) => ({ ...state, name: payload }),
 }, {});

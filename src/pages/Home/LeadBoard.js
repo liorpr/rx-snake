@@ -27,6 +27,7 @@ const Score = glamorous.li({
 
 const renderScores = R.pipe(
   R.toPairs,
+  R.filter(([_, { name, score = 0 }]) => name && name !== '' && score > 0),
   R.sort(R.descend(([_, { score }]) => score)),
   R.map(([playerId, { name, score }]) => <Score key={playerId}>{name} {score}</Score>)
 );
