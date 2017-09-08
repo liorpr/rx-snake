@@ -1,12 +1,11 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { withStateHandlers, compose } from 'recompose';
 import glamorous from 'glamorous';
 import Board from '../../components/Board';
-import Snake from '../../components/Snake/index';
 import GameState from '../../utils/GameState';
-import pointShape from '../../utils/pointShape';
+import withFullScreen from '../../hoc/withFullScreen';
 import { SOLUTO_BLUE, COLORS } from '../../resources/colors';
-import gameLogic from './gameLogic';
+import CurrentPlayer from './CurrentPlayer';
 
 const Wrapper = glamorous.div({
   display: 'flex',
@@ -45,12 +44,13 @@ const SwipeMessage = glamorous.div({
   bottom: 0,
 });
 
-const Game = ({ snake, state, score, current, direction, size, isFullScreen }) => (
+const Game = ({ state, score, current, isFullScreen, ...props }) => (
   <Wrapper>
     <Board current={current} colors={COLORS}>
-      {document.webkitFullscreenEnabled && !isFullScreen ? <SwipeMessage>Double tap to enter full screen mode</SwipeMessage> : null}
+      {document.webkitFullscreenEnabled && !isFullScreen ?
+        <SwipeMessage>Double tap to enter full screen mode</SwipeMessage> : null}
       <Score>{score}</Score>
-      <Snake shape={snake} size={size} direction={direction}/>
+      <CurrentPlayer {...props}/>
       {state === GameState.loaded ? <Message>Swipe or press any arrow to move</Message> : null}
       {state === GameState.ended ? <Message>GAME ENDED<br/>Double tap or press Enter to start again</Message> : null}
       {state === GameState.paused ? <Message>PAUSED</Message> : null}
@@ -58,8 +58,18 @@ const Game = ({ snake, state, score, current, direction, size, isFullScreen }) =
   </Wrapper>
 );
 
-Game.propTypes = {
-  snake: PropTypes.arrayOf(pointShape).isRequired,
+let initialState = {
+  state: GameState.loaded,
+  score: 0,
 };
-
-export default gameLogic(Game);
+export default compose(
+  withFullScreen,
+  withStateHandlers(
+    initialState,
+    {
+      setScore: state => score => ({ ...state, score }),
+      setState: state => gameState => ({ ...state, state: gameState }),
+      setCurrent: () => current => ({ ...initialState, current }),
+    },
+  ),
+)(Game);

@@ -1,4 +1,4 @@
-import { createEventHandler, mapPropsStream, compose } from 'recompose';
+import { createEventHandler, mapPropsStream, setDisplayName, compose } from 'recompose';
 import { connect } from 'react-redux';
 import firebase from 'firebase';
 import R from 'ramda';
@@ -6,10 +6,10 @@ import { Observable } from 'rxjs';
 import withKeyDown from '../../hoc/withKeyDown';
 import withSwipe from '../../hoc/withSwipe';
 import withEvent from '../../hoc/withEvent';
-import withFullScreen from '../../hoc/withFullScreen';
 import Point from '../../utils/Point';
 import GameState from '../../utils/GameState';
 import KeyCodes from '../../utils/KeyCodes';
+import Snake from '../../components/Snake/index';
 import '../../utils/initFirebase';
 
 const snakesRef = firebase.database().ref('game/snakes2');
@@ -55,8 +55,17 @@ const game = mapPropsStream(props$ => {
 
   const sharedProps$ = props$.publishReplay(1).refCount();
 
-  function play({ snake, state, score }, [direction, { candy, gameSize: { width, height } }, pause]) {
-    const result = () => ({ snake, state, score, candy, direction });
+  function play(prev, next) {
+    let { snake, state, score } = prev;
+    let [direction, { candy, gameSize: { width, height }, setScore, setState }, pause] = next;
+    const prevState = state;
+
+    const result = () => {
+      if (state !== prevState) {
+        setState(state);
+      }
+      return { snake, state, score, candy, direction };
+    };
     if (state === GameState.ended || direction.length !== 2) {
       if (pause) onKeyDown(KeyCodes.enter);
       return result();
@@ -74,6 +83,7 @@ const game = mapPropsStream(props$ => {
       candy = Point.random(width, height);
       candyRef.set(R.pick(['x', 'y'], candy));
       score++;
+      setScore(score);
     } else {
       snake = R.dropLast(1, snake);
     }
@@ -115,16 +125,17 @@ const game = mapPropsStream(props$ => {
       return !prev;
     }, true);
 
-  const play$ = sharedProps$.first().map(initSnake)
-    .mergeMap(initialSnake => {
+  const play$ = sharedProps$.first()
+    .mergeMap(initialProps => {
       const snakeRef = snakesRef.push();
       const current = snakeRef.key;
+      initialProps.setCurrent(current);
 
       snakeRef.onDisconnect().remove();
 
       return direction$
         .withLatestFrom(sharedProps$, pause$, Array.of)
-        .scan(play, initialSnake)
+        .scan(play, initSnake(initialProps))
         .distinctUntilChanged(R.equals)
         .do(({ snake, score, state, direction }) => {
           if (state === GameState.loaded) return;
@@ -146,10 +157,11 @@ const game = mapPropsStream(props$ => {
     .startWith(1)
     .switchMapTo(play$);
 
-  return Observable.combineLatest(sharedProps$, game$)
-    .map(([props, game]) => ({
-      ...props,
-      ...game,
+  return Observable.combineLatest(sharedProps$.pluck('size'), game$)
+    .map(([size, { snake: shape, direction }]) => ({
+      size,
+      direction,
+      shape,
       onKeyDown,
       onSwipe: onKeyDown,
       onBlur,
@@ -158,10 +170,10 @@ const game = mapPropsStream(props$ => {
 });
 
 export default compose(
+  setDisplayName('CurrentPlayer'),
   connect(state => state),
   game,
   withKeyDown,
   withSwipe,
   withEvent('blur', 'onBlur'),
-  withFullScreen,
-);
+)(Snake);
