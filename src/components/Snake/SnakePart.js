@@ -1,5 +1,5 @@
 import React from 'react';
-import withLocation from '../hoc/withLocation';
+import withLocation from '../../hoc/withLocation';
 import Head from './Head';
 import Body from './Body';
 import Belly from './Belly';

@@ -1,4 +1,5 @@
 export const SOLUTO_BLUE = '#00aeef';
+export const SOLUTO_GRAY = '#696969';
 
 export const COLORS = [
   '#34BF70',

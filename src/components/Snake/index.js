@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import pointShape from '../Game/utils/pointShape';
+import pointShape from '../../utils/pointShape';
 import SnakePart from './SnakePart';
 
 const Snake = ({ shape, ...props }) => (

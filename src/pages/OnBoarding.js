@@ -1,12 +1,14 @@
 import React from 'react';
 import firebase from 'firebase';
+import R from 'ramda';
 import glamorous, { Div } from 'glamorous';
 import { connect } from 'react-redux';
-import { push } from 'react-router-redux';
-import { setName } from "./store/reducer";
-import { SOLUTO_BLUE } from "./resources/colors";
-import intro from './resources/intro.gif';
-import Logo from './Logo';
+import { withRouter } from 'react-router';
+import { compose } from 'recompose';
+import { setName } from '../store/reducer';
+import { SOLUTO_BLUE, SOLUTO_GRAY } from '../resources/colors';
+import intro from '../resources/intro.gif';
+import Logo from '../components/Logo';
 
 const Container = glamorous.div({
   display: 'flex',
@@ -32,7 +34,7 @@ const Input = glamorous.input({
     fontStyle: 'italic',
     color: SOLUTO_BLUE,
     opacity: 0.4,
-  }
+  },
 });
 
 const Button = glamorous.button({
@@ -46,7 +48,7 @@ const Button = glamorous.button({
   cursor: 'pointer',
   ':focus': { outline: 0 },
   ':disabled': {
-    background: '#696969',
+    background: SOLUTO_GRAY,
     opacity: 0.4,
     cursor: 'default',
   },
@@ -58,7 +60,7 @@ const Img = glamorous.img({
   marginBottom: '-3vmin',
 });
 
-const OnBoarding = ({ name, playerId, setName, push }) => (
+const OnBoarding = ({ name, playerId, setName, history }) => (
   <Container>
     <Logo/>
     <Img src={intro}/>
@@ -72,9 +74,12 @@ const OnBoarding = ({ name, playerId, setName, push }) => (
         .child('name')
         .set(name.trim());
 
-      push('/play');
+      history.push('/play');
     }}>Game on!</Button>
   </Container>
 );
 
-export default connect(state => state, { setName, push })(OnBoarding);
+export default compose(
+  connect(R.pick(['name', 'playerId']), { setName }),
+  withRouter,
+)(OnBoarding);

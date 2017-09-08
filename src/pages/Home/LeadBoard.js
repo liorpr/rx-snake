@@ -3,7 +3,7 @@ import { createEventHandler, mapPropsStream } from 'recompose';
 import R from 'ramda';
 import firebase from 'firebase';
 import glamorous from 'glamorous';
-import { SOLUTO_BLUE } from "./resources/colors";
+import { SOLUTO_BLUE } from '../../resources/colors';
 
 const List = glamorous.ul({
   background: SOLUTO_BLUE,

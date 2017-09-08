@@ -1,6 +1,6 @@
 import React from 'react'
 import glamorous from 'glamorous';
-import { SOLUTO_BLUE } from './resources/colors';
+import { SOLUTO_BLUE } from '../resources/colors';
 
 const Svg = glamorous.svg({
   fill: SOLUTO_BLUE,

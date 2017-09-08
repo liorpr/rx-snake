@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import glamorous from 'glamorous';
-import Board from '../Board';
-import Snake from '../Snake';
-import Candy from '../Candy';
-import Players from '../Players';
-import GameState from './utils/GameState';
-import pointShape from './utils/pointShape';
-import { SOLUTO_BLUE, COLORS } from "../resources/colors";
+import Board from '../../components/Board';
+import Snake from '../../components/Snake/index';
+import Candy from '../../components/Candy';
+import Players from '../../components/Players';
+import GameState from '../../utils/GameState';
+import pointShape from '../../utils/pointShape';
+import { SOLUTO_BLUE, COLORS } from '../../resources/colors';
 
 const Wrapper = glamorous.div({
   display: 'flex',
@@ -46,6 +46,7 @@ const Game = ({ snake, state, score, current, direction, size }) => (
       <Candy/>
       {state === GameState.loaded ? <Message>Swipe or Press any arrow to move</Message> : null}
       {state === GameState.ended ? <Message>GAME ENDED</Message> : null}
+      {state === GameState.paused ? <Message>PAUSED</Message> : null}
     </Board>
   </Wrapper>
 );

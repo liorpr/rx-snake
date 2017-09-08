@@ -12,6 +12,12 @@ const getWindowSize = () => ({
   height: Math.min(document.documentElement.clientHeight, window.innerHeight || Infinity),
 });
 
+let playerId = localStorage.getItem('playerId');
+if (!playerId) {
+  playerId = uuid();
+  localStorage.setItem('playerId', playerId);
+}
+
 export function getInitialState() {
   const gameSize = { width: 48, height: 27 };
   const windowSize = getWindowSize();
@@ -22,7 +28,7 @@ export function getInitialState() {
     candy: { x: -1, y: -1 },
     ...getSize(gameSize, windowSize),
     name: localStorage.getItem('name') || '',
-    playerId: localStorage.getItem('playerId'),
+    playerId,
   }
 }
 
@@ -33,15 +39,8 @@ export const setGameSize = set(SET_GAME_SIZE);
 export const setCandy = set(SET_CANDY);
 
 export function setName(name) {
-  return function (dispatch) {
-    localStorage.setItem('name', name.trim());
-    let playerId = localStorage.getItem('playerId');
-    if (!playerId) {
-      playerId = uuid();
-      localStorage.setItem('playerId', playerId);
-    }
-    dispatch({ type: SET_NAME, payload: { name, playerId } });
-  }
+  localStorage.setItem('name', name.trim());
+  return { type: SET_NAME, payload: name };
 }
 
 function getSize(gameSize, windowSize) {

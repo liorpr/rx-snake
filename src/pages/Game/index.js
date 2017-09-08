@@ -3,14 +3,14 @@ import { connect } from 'react-redux';
 import firebase from 'firebase';
 import R from 'ramda';
 import { Observable } from 'rxjs';
+import withKeyDown from '../../hoc/withKeyDown';
+import withSwipe from '../../hoc/withSwipe';
+import withEvent from '../../hoc/withEvent';
+import Point from '../../utils/Point';
+import GameState from '../../utils/GameState';
+import KeyCodes from '../../utils/KeyCodes';
+import '../../utils/initFirebase';
 import Game from './Game';
-import withKeyDown from "../hoc/withKeyDown";
-import withSwipe from '../hoc/withSwipe';
-import withEvent from '../hoc/withEvent';
-import Point from './utils/Point';
-import GameState from './utils/GameState';
-import KeyCodes from './utils/KeyCodes';
-import '../utils/initFirebase';
 
 const snakesRef = firebase.database().ref('game/snakes2');
 const candyRef = firebase.database().ref('game/config/candy');
@@ -40,10 +40,10 @@ function initSnake({ playerId, gameSize: { width, height } }) {
     state: GameState.loaded,
     snake: R.map(
       () => new Point(~~(width / 2), ~~(height / 2)),
-      R.range(0, 5)
+      R.range(0, 5),
     ),
     score: 0,
-  }
+  };
 }
 
 function detectCollision(nextPoint, snake) {
@@ -59,7 +59,16 @@ function play({ snake, state, score }, [direction, { candy, gameSize: { width, h
     return result();
   }
 
-  const nextPoint = snake[0].move(direction).wrap(width, height);
+  let nextPoint = snake[0].move(direction).wrap(width, height);
+
+  if (nextPoint.equals(candy)) {
+    nextPoint = nextPoint.inflate();
+    candy = Point.random(width, height);
+    candyRef.set(R.pick(['x', 'y'], candy));
+    score++;
+  } else {
+    snake = R.dropLast(1, snake);
+  }
 
   if (detectCollision(nextPoint, snake)) {
     state = GameState.ended;
@@ -68,15 +77,6 @@ function play({ snake, state, score }, [direction, { candy, gameSize: { width, h
   }
 
   snake = R.prepend(nextPoint, snake);
-
-  if (nextPoint.equals(candy)) {
-    snake = R.adjust(p => p.inflate(), 0, snake);
-    candy = Point.random(width, height);
-    candyRef.set(R.pick(['x', 'y'], candy));
-    score++;
-  } else {
-    snake = R.dropLast(1, snake);
-  }
 
   return result();
 }
@@ -104,7 +104,7 @@ const game = mapPropsStream(props$ => {
   const pause$ = keyDown$.filter(key => key === KeyCodes.space).map(_ => 'space')
     .merge(onBlur$.map(_ => 'blur'))
     .startWith('space')
-    .scan((prev, next) => next === 'blur' ? true : !prev , true);
+    .scan((prev, next) => next === 'blur' ? true : !prev, true);
 
   const play$ = sharedProps$.first().map(initSnake)
     .mergeMap(initialSnake => {
@@ -125,7 +125,7 @@ const game = mapPropsStream(props$ => {
             state,
             direction,
             updated: ~~((new Date()).getTime() / 1000),
-          })
+          });
         })
         .map(R.assoc('current', current))
         .finally(() => snakeRef.child('state').set(GameState.ended));
@@ -156,6 +156,6 @@ export default compose(
   lifecycle({
     componentDidMount() {
       window.scrollTo(0, document.body.scrollHeight);
-    }
-  })
-)(Game)
+    },
+  }),
+)(Game);

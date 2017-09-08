@@ -3,9 +3,10 @@ import firebase from 'firebase';
 import { mapPropsStream, createEventHandler, compose, setDisplayName } from 'recompose';
 import R from 'ramda';
 import { Observable } from 'rxjs';
-import GameState from "./Game/utils/GameState";
+import GameState from '../utils/GameState';
 import Snake from './Snake/index';
-import './utils/initFirebase';
+
+import '../utils/initFirebase';
 
 const playersRef = firebase.database()
   .ref('game/snakes2')
@@ -24,7 +25,7 @@ const Players = ({ players, colors, ...props }) => (
           direction,
           ...props
         })),
-        R.map(props => <Snake {...props}/>)
+        R.map(props => <Snake {...props}/>),
       )(players)
     }
   </div>

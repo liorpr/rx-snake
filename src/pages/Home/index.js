@@ -1,16 +1,17 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import R from 'ramda';
 import glamorous, { Span, Img } from 'glamorous';
-import colors from './resources/colors';
-import Board from './Board';
-import Candy from './Candy';
-import Players from './Players';
+import colors, { SOLUTO_GRAY } from '../../resources/colors';
+import qrCode from '../../resources/qr-code.png';
+import Board from '../../components/Board';
+import Candy from '../../components/Candy';
+import Players from '../../components/Players';
 import LeadBoard from './LeadBoard';
-import qrCode from './resources/qr-code.png'
 
 const Wrapper = glamorous.div({
   color: 'white',
-  background: '#696969',
+  background: SOLUTO_GRAY,
   height: '100vh',
   boxSizing: 'border-box',
   fontSize: '4vmin',
@@ -83,4 +84,4 @@ const Home = ({ size, candy }) => (
   </Wrapper>
 );
 
-export default connect(state => state)(Home);
+export default connect(R.pick(['candy', 'size']))(Home);
