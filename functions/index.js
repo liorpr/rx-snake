@@ -12,14 +12,11 @@ exports.topScores = functions.database.ref('game/snakes2/{snakeId}/score')
       .then(x => x.val())
       .then(playerId => {
         const scoreRef = playersRef.child(playerId).child('score');
-        return scoreRef.once('value')
-          .then(x => x.exists() ? x.val() : 0)
-          .then(topScore => {
-            if (score > topScore) {
-              return scoreRef.set(score);
-            }
-          });
-      });
+        return scoreRef.transaction(topScore => {
+          if (score > topScore) return score;
+        });
+      })
+      .then(() => null);
   });
 
 exports.candyValidation = functions.database.ref('game/config')

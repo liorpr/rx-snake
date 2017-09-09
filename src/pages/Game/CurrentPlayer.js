@@ -174,6 +174,6 @@ export default compose(
   connect(state => state),
   game,
   withKeyDown,
-  withSwipe,
+  withSwipe('game'),
   withEvent('blur', 'onBlur'),
 )(Snake);

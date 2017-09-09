@@ -1,25 +1,31 @@
 import { lifecycle, mapProps, compose } from 'recompose';
 import R from 'ramda';
 import Hammer from 'hammerjs';
+import KeyCodes from '../utils/KeyCodes';
 
-export default compose(
+const events = {
+  swiperight: KeyCodes.swipeRight,
+  swipeleft: KeyCodes.swipeLeft,
+  swipeup: KeyCodes.swipeUp,
+  swipedown: KeyCodes.swipeDown,
+  doubletap: KeyCodes.space,
+};
+
+export default elementId => compose(
   lifecycle({
     componentDidMount() {
       const onSwipe = direction => () => {
         this.props.onSwipe(direction);
       };
 
-      this.hammer = new Hammer(document.documentElement);
+      this.hammer = new Hammer(document.getElementById(elementId));
       this.hammer.get('swipe').set({
         direction: Hammer.DIRECTION_ALL,
         threshold: 5,
         velocity: 0.2,
       });
-      this.hammer.on('swiperight', onSwipe('SwipeRight'));
-      this.hammer.on('swipeleft', onSwipe('SwipeLeft'));
-      this.hammer.on('swipeup', onSwipe('SwipeUp'));
-      this.hammer.on('swipedown', onSwipe('SwipeDown'));
-      this.hammer.on('doubletap', onSwipe('Space'));
+
+      Object.keys(events).forEach(event => this.hammer.on(event, onSwipe(events[event])));
     },
     componentWillUnmount() {
       if (this.hammer) {

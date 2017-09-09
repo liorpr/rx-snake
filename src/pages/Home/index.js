@@ -1,9 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { compose } from 'recompose';
 import R from 'ramda';
 import glamorous, { Span, Img } from 'glamorous';
 import colors, { SOLUTO_GRAY } from '../../resources/colors';
 import qrCode from '../../resources/qr-code.png';
+import withFirebase from '../../hoc/withFirebase';
 import Board from '../../components/Board';
 import LeadBoard from './LeadBoard';
 
@@ -55,7 +57,7 @@ const MeetupInfo = glamorous.div({
   flexDirection: 'column',
 });
 
-const Home = ({ size, candy }) => (
+const Home = ({ size, candy, meetupDate }) => (
   <Wrapper>
     <Grid>
       <Header><strong>Soluto</strong> Snake</Header>
@@ -64,12 +66,14 @@ const Home = ({ size, candy }) => (
         <Img width="25vmin" src={qrCode}/>
         <Span fontSize="2.5vmin">https://goo.gl/nADJAu</Span>
       </CallToAction>
-      <MeetupInfo>
-        <span>Join our Rx meetup</span>
-        <span><strong>@2/10/2017</strong></span>
-        <span>and see how this</span>
-        <span>game was made</span>
-      </MeetupInfo>
+      {meetupDate ?
+        <MeetupInfo>
+          <span>Join our Rx meetup</span>
+          <span><strong>@{meetupDate}</strong></span>
+          <span>and see how this</span>
+          <span>game was made</span>
+        </MeetupInfo>
+        : null}
       <GameArea>
         <Board style={{ zoom: 0.834 }} colors={colors}/>
         <LeadBoard/>
@@ -78,4 +82,7 @@ const Home = ({ size, candy }) => (
   </Wrapper>
 );
 
-export default connect(R.pick(['candy', 'size']))(Home);
+export default compose(
+  connect(R.pick(['candy', 'size'])),
+  withFirebase('meetup', 'meetupDate'),
+)(Home);

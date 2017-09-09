@@ -45,7 +45,7 @@ const SwipeMessage = glamorous.div({
 });
 
 const Game = ({ state, score, current, isFullScreen, ...props }) => (
-  <Wrapper>
+  <Wrapper id="game">
     <Board current={current} colors={COLORS}>
       {document.webkitFullscreenEnabled && !isFullScreen ?
         <SwipeMessage>Double tap to enter full screen mode</SwipeMessage> : null}

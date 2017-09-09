@@ -62,7 +62,7 @@ const Img = glamorous.img({
 
 const OnBoarding = ({ name, setName, startGame }) => (
   <Container>
-    <a href="https://www.solutotlv.com/" target="_blank"><Logo/></a>
+    <a href="https://www.solutotlv.com/" target="_blank" rel="noopener noreferrer"><Logo/></a>
     <Img src={intro}/>
     <div>
       <Input placeholder="Your name goes here" value={name} onChange={e => setName(e.target.value)}/>
