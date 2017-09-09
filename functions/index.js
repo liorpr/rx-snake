@@ -2,7 +2,7 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
 
-exports.topScores = functions.database.ref('game/snakes2/{snakeId}/score')
+exports.topScores = functions.database.ref('game/snakes3/{snakeId}/score')
   .onUpdate(event => {
     const snakeRef = event.data.ref.parent;
     const playersRef = snakeRef.parent.parent.child('players');

@@ -12,7 +12,7 @@ import KeyCodes from '../../utils/KeyCodes';
 import Snake from '../../components/Snake/index';
 import '../../utils/initFirebase';
 
-const snakesRef = firebase.database().ref('game/snakes2');
+const snakesRef = firebase.database().ref('game/snakes3');
 const candyRef = firebase.database().ref('game/config/candy');
 
 function toDirection(keyCode) {
